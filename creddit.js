@@ -1,7 +1,7 @@
 var bcrypt = require('bcrypt');
 var HASH_ROUNDS = 10;  
 
-module.exports = function RedditAPI(conn) {
+module.exports = function CredditAPI(conn) {
   return {
     createUser: function(user, callback) {
       
@@ -59,21 +59,27 @@ module.exports = function RedditAPI(conn) {
       });
     },
     createPost: function(post, callback) {
+      console.log("RECEIVED POST INFO=============================", post)
+      
       conn.query(
         'INSERT INTO `posts` (`userId`, `title`, `url`, `createdAt`, `subredditId`) VALUES (?, ?, ?, ?, ?)', 
         [post.userId, post.title, post.url, null, post.subredditId],
         function(err, result) {
+            
           if (err) {
+              console.log("record not created")
             callback(err);
           }
           else {
+              console.log("post created!!!!!!!!!!!!! ------------------", result)
             /*
             Post inserted successfully. Let's use the result.insertId to retrieve
             the post and send it to the caller!
             */
             conn.query(
-              'SELECT `id`,`title`,`url`,`userId`, `createdAt`, `updatedAt`, `subredditId` FROM `posts` WHERE `id` = ?', [result.insertId],
+              'SELECT * FROM `posts` WHERE `id` = ?', [result.insertId],
               function(err, result) {
+                
                 if (err) {
                   callback(err);
                 }
@@ -178,24 +184,28 @@ module.exports = function RedditAPI(conn) {
           } 
           else if (results.length === 0) {
             console.log("User ID does not exist");
+            callback(err);
             return;
           }
           else {
-            callback(results.map(function(obj) {
-              var rObj = {};
-              rObj.id = obj.posts_id;
-              rObj.title = obj.posts_title;
-              rObj.url = obj.posts_url;
-              rObj.createdAt = obj.posts_createdAt;
-              rObj.updatedAt = obj.posts_updatedAt;
-              rObj.userId = obj.posts_userId;
-              rObj.users = {}
-                  rObj.users.id = obj.users_id;
-                  rObj.users.username = obj.users_username;
-                  rObj.users.createdAt = obj.users_createdAt;
-                  rObj.users.updatedAt = obj.users_updatedAt;
-              return rObj;
-            }));
+            // callback(results.map(function(obj) {
+            //   var rObj = {};
+            //   rObj.id = obj.posts_id;
+            //   rObj.title = obj.posts_title;
+            //   rObj.url = obj.posts_url;
+            //   rObj.createdAt = obj.posts_createdAt;
+            //   rObj.updatedAt = obj.posts_updatedAt;
+            //   rObj.userId = obj.posts_userId;
+            //   rObj.users = {}
+            //       rObj.users.id = obj.users_id;
+            //       rObj.users.username = obj.users_username;
+            //       rObj.users.createdAt = obj.users_createdAt;
+            //       rObj.users.updatedAt = obj.users_updatedAt;
+            //   return rObj;
+            // }));
+            // console.log("RESULT OF FUNCTON---------------xxxxxxxxxxxxxxx----------", results)
+            callback(null, results)
+            
           }
         }
       );
@@ -217,29 +227,39 @@ module.exports = function RedditAPI(conn) {
         `
       conn.query(sqlQuery,
         function(err, results) {
+            // console.log("QUERY ERR=============================", err)
+            // console.log("QUERY RESULT TYPE=============================", typeof results)
+            // console.log("QUERY RESULT=============================", results)
+            
           if (err) {
             callback(err);
           } 
           else if (results.length === 0) {
             console.log("Post ID does not exist");
+            callback(err)
             return;
           }
           else {
-            callback(results.map(function(obj) {
-              var rObj = {};
-              rObj.id = obj.posts_id;
-              rObj.title = obj.posts_title;
-              rObj.url = obj.posts_url;
-              rObj.createdAt = obj.posts_createdAt;
-              rObj.updatedAt = obj.posts_updatedAt;
-              rObj.userId = obj.posts_userId;
-              rObj.users = {}
-                  rObj.users.id = obj.users_id;
-                  rObj.users.username = obj.users_username;
-                  rObj.users.createdAt = obj.users_createdAt;
-                  rObj.users.updatedAt = obj.users_updatedAt;
-              return rObj;
-            }));
+
+            // results.map(function(obj) {
+            //   var rObj = {};
+            //   rObj.id = obj.posts_id;
+            //   rObj.title = obj.posts_title;
+            //   rObj.url = obj.posts_url;
+            //   rObj.createdAt = obj.posts_createdAt;
+            //   rObj.updatedAt = obj.posts_updatedAt;
+            //   rObj.userId = obj.posts_userId;
+            //   rObj.users = {}
+            //       rObj.users.id = obj.users_id;
+            //       rObj.users.username = obj.users_username;
+            //       rObj.users.createdAt = obj.users_createdAt;
+            //       rObj.users.updatedAt = obj.users_updatedAt;
+            //   console.log("OBJECT Obj------------------------------", rObj)
+            
+            // });
+              // console.log("OBJECT EXPORTED------------------------------", results[0]);
+              callback(null, results);
+            
           }
         }
       );

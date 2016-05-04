@@ -12,4 +12,19 @@ posts
 (title, url, userId, createdAt, subredditId)
 VALUES
 ('another title of post', 'www.yahoo.ca', 1, null, 2)
-  
+
+
+INSERT INTO
+users
+(username, password, createdAt)
+VALUES
+('User Number 3', '123', null)
+
+INSERT INTO
+users
+(username, password, createdAt)
+VALUES
+('User Number 4', 123, null)
+
+
+
