@@ -22,91 +22,6 @@ app.use(cookieParser())
 
 // ------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------
-// function getSinglePost(postId, callback) {
-
-//   // if blank userId is passed, do not add WHERE condition,return all posts
-//   // userId set to "" if doesnt exist in get function below
-//   var postIdString
-  
-//   if (postId === "") {
-//     postIdString = "";
-//   }
-//   else {
-//     postIdString = "WHERE posts.id =" + postId;
-//   }
-//   // console.log("POSTID----------------------", postId)
-//   // console.log("POSTID STRING----------------------", postIdString)
-  
-//   connection.query(`
-//   SELECT posts.id AS id, posts.title AS title, posts.url AS url, posts.userId AS userId, posts.createdAt AS createdAt, users.username AS username
-//   FROM posts 
-//   JOIN users
-//   ON posts.userId=users.id
-//   ${postIdString}
-//   `, function(err, results) {
-//     if (err) {
-//       callback(err)
-//     }
-//     else {
-//       callback(null, results)
-//     }
-//   })
-// }
-
-// ------------------------------------------------------------------------------------
-// function getPosts(userId, callback) {
-
-//   // if blank userId is passed, do not add WHERE condition,return all posts
-//   // userId set to "" if doesnt exist in get function below
-//   var userIdString
-//   if (userId === "") {
-//     userIdString = "";
-//   }
-//   else {
-//     userIdString = "WHERE userId =" + userId;
-//   }
-
-  
-//   connection.query(`
-//   SELECT posts.id AS id, posts.title AS title, posts.url AS url, posts.userId AS userId, posts.createdAt AS createdAt, users.username AS username
-//   FROM posts 
-//   JOIN users
-//   ON posts.userId=users.id
-//   ${userIdString}
-//   ORDER BY createdAt 
-//   DESC LIMIT 20
-//   `, function(err, results) {
-//     if (err) {
-//       callback(err)
-//     }
-//     else {
-//       callback(null, results)
-//     }
-//   })
-// }
-
-// // ------------------------------------------------------------------------------------
-// function createPosts(title, url, userId, callback) {
-//   // assumes subredditId is 2
-//   var dbQuery = `
-//   INSERT INTO posts 
-//   (title, url, userId, createdAt, subredditId)
-//   VALUES
-//   ('${title}', '${url}', '${userId}', null, 2)
-//   `
-  
-//   connection.query(dbQuery, function(err, results) {
-//     if (err) {
-//       callback(err);
-//     }
-//     else {
-//       callback(null, results);
-//     }
-//   })
-// }
-
-// ------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------
 
 app.use(function(request, response, next) {
   // this will run EVERY time there is a web request, could set cookies here
@@ -297,50 +212,54 @@ app.get('/login', function(request, response) {
 })
 
 // ------------------------------------------------------------------------------------
-function checkLogin(userId, pwd, callback) {
-  var dbQuery = `
-    SELECT * 
-    FROM users 
-    WHERE id = ${userId}
-    `
-  console.log("EXECUTING CHECKLOGIN----------------------------------")
+// function checkLogin(userId, pwd, callback) {
+//   var dbQuery = `
+//     SELECT * 
+//     FROM users 
+//     WHERE id = ${userId}
+//     `
+//   console.log("EXECUTING CHECKLOGIN----------------------------------")
   
-  connection.query(dbQuery, function(err, results) {
+//   connection.query(dbQuery, function(err, results) {
   
-  console.log("IN EXECUTING CHECKLOGIN----------------------------------")
-  console.log(err, results);
+//   console.log("IN EXECUTING CHECKLOGIN----------------------------------")
+//   console.log(err, results);
   
-    if (results.length === 0) {
-      console.log("ERROR----------------------", err)
-        // error message query had no result
-      callback(new Error('username or password incorrect'));
-      return;
-    }
-    else {
-      // now we have resulting user info, need to validate password
-      var user = results[0]; // all info for given userId
-      console.log("RETRIEVED INFO========================", user)
-      var actualUserPwd = results[0].password || ""; // actual pwd stored in the database
+//     if (results.length === 0) {
+//       console.log("ERROR----------------------", err)
+//         // error message query had no result
+//       callback(new Error('username or password incorrect'));
+//       return;
+//     }
+//     else {
+//       // now we have resulting user info, need to validate password
+//       var user = results[0]; // all info for given userId
+//       console.log("RETRIEVED INFO========================", user)
+//       var actualUserPwd = results[0].password || ""; // actual pwd stored in the database
   
-      console.log("RETRIEVED PASSWORD========================", actualUserPwd)
-      console.log("FORM PASSWORD========================", pwd)
+//       console.log("RETRIEVED PASSWORD========================", actualUserPwd)
+//       console.log("FORM PASSWORD========================", pwd)
   
-      bcrypt.compare(pwd, actualUserPwd, function(err, result) {
-        console.log("bcrypt result===============", result)
-        if (result === true) {
-          // password match true, return all user info
-          callback(null, user)
-        }
-        else {
-          callback(new Error('password wrong'));
-        }
+//       bcrypt.compare(pwd, actualUserPwd, function(err, result) {
+//         if (err) {
+//           console.log(err)  // shouldnt be an error here, will return true or false
+//         }
+        
+//         console.log("bcrypt result===============", result)
+//         if (result === true) {
+//           // password match true, return all user info
+//           callback(null, user)
+//         }
+//         else {
+//           callback(new Error('password wrong'));
+//         }
   
-      })
+//       })
   
-    }
-  })
+//     }
+//   })
   
-}
+// }
   
 // ------------------------------------------------------------------------------------
 
@@ -351,7 +270,7 @@ app.post('/login', function(request, response) {
 
   // console.log(id, pwd, "now calling checkLogin function");
   
-  checkLogin(id, pwd, function(err, result) {
+  credditAPI.checkLogin(id, pwd, function(err, result) {
   
   console.log("THIS IS ERR FROM FN=======================", err);
   console.log("THIS IS RESULT FROM FN=======================", result);
@@ -359,11 +278,12 @@ app.post('/login', function(request, response) {
   
   if (err) {
     console.log(err);
-    response.send("did not work")
+    response.send("username or password incorrect") // redirect user back to login page
   }
   else {
     console.log(result);
-    response.send(result)
+    response.send("it worked!!!!!!!!!!!!!!!!!!!")
+    // if login is ok, redirect user to a list of their posts
   }
     
   })

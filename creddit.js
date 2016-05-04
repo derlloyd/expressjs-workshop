@@ -438,6 +438,84 @@ module.exports = function CredditAPI(conn) {
           }
         );
       },  
+    checkLogin: function(userId, pwd, callback) {
+    var dbQuery = `
+    SELECT * 
+    FROM users 
+    WHERE id = ${userId}
+    `
+    console.log("EXECUTING CHECKLOGIN----------------------------------")
+  
+    conn.query(dbQuery, function(err, results) {
+  
+  console.log("IN EXECUTING CHECKLOGIN----------------------------------")
+  console.log(err, results);
+  
+    if (results.length === 0) {
+      console.log("ERROR----------------------", err)
+        // error message query had no result
+      callback(new Error('username or password incorrect'));
+      return;
+    }
+    else {
+      // now we have resulting user info, need to validate password
+      var user = results[0]; // all info for given userId
+      console.log("RETRIEVED INFO========================", user)
+      var actualUserPwd = results[0].password || ""; // actual pwd stored in the database
+  
+      console.log("RETRIEVED PASSWORD========================", actualUserPwd)
+      console.log("FORM PASSWORD========================", pwd)
+  
+  
+      // cancel this code for now
+      if (actualUserPwd === pwd) {
+        callback(null, user);
+      return;  
+      }
+      else {
+        callback(err);
+        return;
+      }
+      
+      
+      
+      bcrypt.compare(pwd, actualUserPwd, function(err, result) {
+        if (err) {
+          console.log(err)  // shouldnt be an error here, will return true or false
+        }
+        
+        console.log("bcrypt result===============", result)
+        if (result === true) {
+          // password match true, return all user info
+          callback(null, user)
+        }
+        else {
+          callback(err);
+        }
+      })
+  
+  
+  
+    }
+  })
+  
+}
+  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
   }
 }
