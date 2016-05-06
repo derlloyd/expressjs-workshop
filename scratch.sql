@@ -10,7 +10,9 @@ INSERT INTO sessions
             userId = 2,
             token = 'xxxxxx111111122222223'
 
-
+INSERT INTO `tags` (`tag`) VALUES ('myvalue1')
+  ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id), `tag`='myvalue1';
+SELECT LAST_INSERT_ID();
 
 
 SELECT sessions.userId, sessions.token, users.userId, users.username

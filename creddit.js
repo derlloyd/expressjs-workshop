@@ -513,8 +513,30 @@ module.exports = function CredditAPI(conn) {
                 console.log("QUERY ERR---------------", err)
                 
                 if (err) {
-                    // session could already exist, so no need to make a new one
-                    callback(err);
+                    // session could already exist, user just deleted his cookies, so get the session
+                    console.log("==============ERR EXISTS===========")
+                    var dbQuery2 = `
+                    SELECT token
+                    FROM sessions
+                    WHERE
+                    userId = ${userId}
+                    `
+                    conn.query(dbQuery2, function(err, result) {
+                        console.log("create session ERR===========================", err)
+                        console.log("create session RESULT================", result)
+                        
+                        if (err) {
+                            //if for some reason query returns nothing, return error
+                            callback(err)
+                        }
+                        else {
+                            console.log("results of query to get session================================", result)
+                            // send existing token back to routing to make a cookie with it
+                            callback(null, result[0])
+                        }
+                        
+                    })
+                    
                 }
                 else {
                     // if success, return the token so that we can use for cookies

@@ -27,20 +27,34 @@ var moment = require('moment')
 app.use(function(request, response, next) {
     // this will run EVERY time there is a web request, could set cookies here
 
-    console.log("REQUEST HEADER====================================", request.headers);
-    console.log("REQUEST COOKIES session================================", request.cookies.SESSION);
+    console.log("REQUEST.HEADER====================================", request.headers);
+    
+    if (!request.cookies.SESSION) {
+        console.log("there is no session======================8888888888888888777777777777777333")
+        // no sessin either means that user has never logged in
+        // OR could mean that user had deleted his cookie
+        // 
+        
+        
+        
+        
+    }
+    else {
+        
+    console.log("REQUEST.COOKIES.session================================", request.cookies.SESSION);
     // query db using token to see if user exists, 
     // if yes, then add id and username tor equest object
     var currentSession = request.cookies.SESSION;
     
+    console.log("CURRENTSESSION=========================", currentSession)
     
     
-    
-    
-    
+        
+    }
     
     // callback next to indicate that finished
     next();
+    
 })
 
 // ------------------------------REQUEST HANDLERS--------------------------------------
@@ -48,13 +62,13 @@ app.use(function(request, response, next) {
 
 app.get('/', function(req, res) {
     
-    var thisSession = req.cookies.SESSION || "";  // if no cookie, empty string so search still works
-    // console.log("THIS SESSION============================================", thisSession);
+    var thisSession = req.cookies.SESSION.token || "";  // if no cookie, empty string so search still works
+    console.log("THIS SESSION============================================", thisSession);
     
     credditAPI.getUserInfoFromSession(thisSession, function(err, result) {
         // returns (null, false) or (null, result object) with user info
     
-    // console.log("RESULTS OF QUERY=================================", result)
+    console.log("RESULTS OF QUERY=================================", result)
     
     // if cookies exist, log user in and show 2 extra buttons in header:
     // add posts and show my posts
@@ -303,9 +317,7 @@ app.get('/login', function(request, response) {
         </form>
         
         <form action="/" method="GET"> 
-              <div>
-                Back to homepage
-              </div>
+              
               <button type="submit">Back to Homepage</button>
             </form>
         
@@ -338,23 +350,23 @@ app.post('/login', function(request, response) {
         }
         
         if (result === false) {
+            // for some reason, not able to login
             
+            var htmlStr = `
+            <form action="/login" method="GET"> 
+              <div>
+                Username or password error, please try again.
+              </div>
+              <button type="submit">Back to Login</button>
+            </form>
             
+            <form action="/" method="GET"> 
+              
+              <button type="submit">Back to Homepage</button>
+            </form>
+        `    
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            response.redirect('/')
+            response.send(htmlStr)
             return;
         }
         
@@ -369,15 +381,23 @@ app.post('/login', function(request, response) {
         credditAPI.createSession(retId, function(err, result) {
         // if all was ok, result of this is (null, token)
         // need to do function(err, result) {send cookie}
+        
+        console.log("CREATE SESSION ERR=========================", err)
+        console.log("CREATE SESSION RESULT=========================", result)
             if (err) {
                 // unable to create session, probably because user already has
                 // a token entry in the sessions table
                 // not their first time loggin in
                 // no problem, send them to homepage
+                
+                // -- FUTURE TROUBLESHOOTING --
+                // [Error: ER_DUP_ENTRY:
+                // User and session may exist but user may have deleted cookies
                 response.redirect('/');
             }
             else {
                 // first time login, give user token as a cookie
+                
                 response.cookie('SESSION', result);
                 response.redirect('/');
             }
@@ -456,20 +476,34 @@ app.post('/signup', function(request, response) {
         else {
             
             console.log("RESULT after createUser------------------------------", result)
+            // object with id, username etc...
             
             // this would make the user have to login after signing up
-        //     var htmlStr = `
-        //     <form action="/login" method="GET"> 
-        //       <div>
-        //         Account created, please login:
-        //       </div>
-        //       <button type="submit">Login</button>
-        //     </form>
-        // `   
+            //     var htmlStr = `
+            //     <form action="/login" method="GET"> 
+            //       <div>
+            //         Account created, please login:
+            //       </div>
+            //       <button type="submit">Login</button>
+            //     </form>
+            // `   
             // response.send(htmlStr)
             
-            response.cookie('SESSION', result);
-            response.redirect('/')
+            // all good so far, create token here and add it to the cookie
+            credditAPI.createSession(result.id, function(err, result) {
+                if (err) {
+                    response.redirect('/');
+                }
+                else {
+                    console.log("RESPONSE FROM CREATE SESSIOON=========", result);
+                    
+                    response.cookie('SESSION', result);
+                    response.redirect('/')
+                    
+                }
+                
+            })
+            
                 // redirect to homepage
         }
 
