@@ -1,5 +1,6 @@
 var bcrypt = require('bcrypt');
 var HASH_ROUNDS = 10;
+var secureRandom = require('secure-random')
 
 module.exports = function CredditAPI(conn) {
     return {
@@ -357,8 +358,8 @@ module.exports = function CredditAPI(conn) {
             function createComm() {
 
                 conn.query(`
-          INSERT INTO comments (text, userId, postId, parentId, createdAt)
-            VALUES (?, ?, ?, ?, ?)
+              INSERT INTO comments (text, userId, postId, parentId, createdAt)
+                VALUES (?, ?, ?, ?, ?)
             `, [comment.text, comment.userId, comment.postId, comment.parentId, null],
                     function(err, result) {
                         if (err) {
@@ -454,11 +455,12 @@ module.exports = function CredditAPI(conn) {
                 // console.log(err, results);
 
                 if (results.length === 0) {
-                    console.log("ERROR----------------------", err)
+                    console.log("ERROR results.length is 0 ----------------------", err)
                         // error message query had no result
-                    callback(err);
-                    return;
-                } //almost there, why can i not return an error when query returns no results????
+                    // callback(new Error('username of pw incorrect'));
+                    callback(null, false);
+                    // return;
+                } 
                 else {
                     // now we have resulting user info, need to validate password
                     var user = results[0]; // all info for given userId
@@ -472,42 +474,86 @@ module.exports = function CredditAPI(conn) {
                     bcrypt.compare(pwd, actualUserPwd, function(err, result) {
                         if (err) {
                             console.log(err) // shouldnt be an error here, will return true or false
-                            callback(err);
-                            return;
+                            callback(null, false);  //return as if passswords did not match
                             
                         }
 
                         console.log("bcrypt result===============", result)
                         
                         if (result === true) {
-                            // password match true, return all user info
+                            // password match true, return all user to router
                             callback(null, user)
                         }
                         else {
-                            console.log("Bcrypt compare is FALSE---------------------")
-                            // this is not displaying anything
-                            return callback(err);
+                            // password match NOT true, return false to router
+                            callback(null, false);
                         }
                     })
-
-
 
                 }
             })
 
+        },
+        createSessionToken: function(userId, callback) {
+            // new function declaration
+            return secureRandom.randomArray(100).map(code => code.toString(36)).join('')
+            // return secureRandom.randomArray(100).map(function(code) {return code.toString(36)}).join('');
+        
+        },
+        createSession: function(userId, callback) {
+            var token = this.createSessionToken();
+            var dbQuery = `
+            INSERT INTO sessions
+            SET 
+            userId = ${userId},
+            token = '${token}'
+            `
+            conn.query(dbQuery, function(err, result) {
+                console.log("QUERY REUSLT---------------", result)
+                console.log("QUERY ERR---------------", err)
+                
+                if (err) {
+                    // session could already exist, so no need to make a new one
+                    callback(err);
+                }
+                else {
+                    // if success, return the token so that we can use for cookies
+                    callback(null, token);
+                }
+            })
+        },
+        getUserInfoFromSession: function(session, callback) {
+            // does a match exist for token in users cookies
+            // if yes, return all info for that user
+            
+            var dbQuery = `
+                SELECT sessions.userId AS sessions_userId, sessions.token AS sessions_token, 
+                users.id AS users_id, users.username AS users_username
+                FROM sessions
+                JOIN users
+                ON sessions.userId=users.id
+                WHERE sessions.token = '${session}'
+            `
+            conn.query(dbQuery, function(err, result) {
+                console.log("QUERY ERR=============================", err)
+                console.log("QUERY RESULT=============================", result)
+                
+                if (err) {
+                    callback(null, false);
+                }
+                else if (result.length === 0) {
+                    // result is an array with no length if no record exists
+                    callback(null, false);
+                }
+                else {
+                    callback(null, result[0]);
+                }    
+            })
+            
         }
-
-
-
-
-
-
-
-
-
-
-
-
+        
+        
+        // insert new functions here
 
 
 

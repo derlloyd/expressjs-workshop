@@ -1,3 +1,45 @@
+
+CREATE TABLE sessions (
+id INT auto_increment PRIMARY KEY, 
+userId INT, 
+token VARCHAR(200))
+
+
+INSERT INTO sessions
+            SET 
+            userId = 2,
+            token = 'xxxxxx111111122222223'
+
+
+
+
+SELECT sessions.userId, sessions.token, users.userId, users.username
+FROM sessions
+JOIN users
+ON sessions.userId=users.userId
+WHERE sessions.token= REQUEST.TOKEN
+
+
+
+SELECT sessions.userId, sessions.token, users.id, users.username
+FROM sessions
+JOIN users
+ON sessions.userId=users.id
+WHERE sessions.userId = 16
+
+
+
+ALTER TABLE sessions ADD UNIQUE userId
+
+
+
+
+
+
+
+
+
+
 SELECT posts.id AS id, posts.title AS title, posts.url AS url, posts.userId AS userId, posts.createdAt AS createdAt, users.username AS username
 FROM posts 
 JOIN users
