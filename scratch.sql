@@ -1,4 +1,35 @@
 
+
+***REQUEST OBJECT*****
+
+sessions_userId: 20,
+sessions_token: '296m2m28u1z6u5yi665j4x2e6f54p3a6'
+users_id: 20,
+users_username: 'user123'
+
+req.displayOptions.page
+req.displayOptions.numPerPage
+
+
+
+
+
+
+add functionality to change page number and change listings per page
+
+add comments to posts
+add voting table
+
+add sorting
+
+reaact??
+
+
+
+
+
+
+
 CREATE TABLE sessions (
 id INT auto_increment PRIMARY KEY, 
 userId INT, 
@@ -34,7 +65,10 @@ WHERE sessions.userId = 16
 ALTER TABLE sessions ADD UNIQUE userId
 
 
-
+SELECT token
+FROM sessions
+WHERE
+userId = 16
 
 
 

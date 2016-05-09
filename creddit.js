@@ -1,6 +1,7 @@
 var bcrypt = require('bcrypt');
 var HASH_ROUNDS = 10;
 var secureRandom = require('secure-random')
+var moment = require('moment')
 
 module.exports = function CredditAPI(conn) {
     return {
@@ -128,7 +129,7 @@ module.exports = function CredditAPI(conn) {
                         callback(err);
                     }
                     else {
-                        callback(results.map(function(obj) {
+                        callback(null, results.map(function(obj) {
                             var rObj = {};
                             rObj.id = obj.posts_id;
                             rObj.title = obj.posts_title;
@@ -156,7 +157,7 @@ module.exports = function CredditAPI(conn) {
         },
         getAllPostsForUser: function(userId, options, callback) {
             // In case we are called without an options parameter, shift all the parameters manually
-
+            
             if (!callback) {
                 callback = options;
                 options = {};
@@ -180,14 +181,21 @@ module.exports = function CredditAPI(conn) {
         `
             conn.query(sqlQuery, [limit, offset],
                 function(err, results) {
+                    console.log("conn query result----------------------------------------", results)
+                    console.log("conn query err----------------------------------------", err)
+
+
                     if (err) {
+                        console.log("conn query if err----------------------------------------", err)
+
                         callback(err);
                     }
-                    else if (results.length === 0) {
-                        console.log("User ID does not exist");
-                        callback(err);
-                        return;
-                    }
+                    // else if (results.length === 0) {
+                    //     console.log("conn query if err----------------------------------------", err)
+                    //     console.log("User ID does not exist");
+                    //     callback(err);
+                    //     return;
+                    // }
                     else {
                         // callback(results.map(function(obj) {
                         //   var rObj = {};
@@ -448,19 +456,19 @@ module.exports = function CredditAPI(conn) {
             console.log("EXECUTING CHECKLOGIN----------------------------------")
 
             conn.query(dbQuery, function(err, results) {
-                
+
                 console.log("IN EXECUTING CHECKLOGIN----------------------------------")
                 console.log("QUERY RESULTS----------------------------------", results)
                 console.log("QUERY RESULTS LENGTH----------------------------------", results.length)
-                // console.log(err, results);
+                    // console.log(err, results);
 
                 if (results.length === 0) {
                     console.log("ERROR results.length is 0 ----------------------", err)
                         // error message query had no result
-                    // callback(new Error('username of pw incorrect'));
+                        // callback(new Error('username of pw incorrect'));
                     callback(null, false);
                     // return;
-                } 
+                }
                 else {
                     // now we have resulting user info, need to validate password
                     var user = results[0]; // all info for given userId
@@ -474,12 +482,12 @@ module.exports = function CredditAPI(conn) {
                     bcrypt.compare(pwd, actualUserPwd, function(err, result) {
                         if (err) {
                             console.log(err) // shouldnt be an error here, will return true or false
-                            callback(null, false);  //return as if passswords did not match
-                            
+                            callback(null, false); //return as if passswords did not match
+
                         }
 
                         console.log("bcrypt result===============", result)
-                        
+
                         if (result === true) {
                             // password match true, return all user to router
                             callback(null, user)
@@ -497,8 +505,8 @@ module.exports = function CredditAPI(conn) {
         createSessionToken: function(userId, callback) {
             // new function declaration
             return secureRandom.randomArray(100).map(code => code.toString(36)).join('')
-            // return secureRandom.randomArray(100).map(function(code) {return code.toString(36)}).join('');
-        
+                // return secureRandom.randomArray(100).map(function(code) {return code.toString(36)}).join('');
+
         },
         createSession: function(userId, callback) {
             var token = this.createSessionToken();
@@ -511,7 +519,7 @@ module.exports = function CredditAPI(conn) {
             conn.query(dbQuery, function(err, result) {
                 console.log("QUERY REUSLT---------------", result)
                 console.log("QUERY ERR---------------", err)
-                
+
                 if (err) {
                     // session could already exist, user just deleted his cookies, so get the session
                     console.log("==============ERR EXISTS===========")
@@ -524,19 +532,19 @@ module.exports = function CredditAPI(conn) {
                     conn.query(dbQuery2, function(err, result) {
                         console.log("create session ERR===========================", err)
                         console.log("create session RESULT================", result)
-                        
+
                         if (err) {
                             //if for some reason query returns nothing, return error
                             callback(err)
                         }
                         else {
                             console.log("results of query to get session================================", result)
-                            // send existing token back to routing to make a cookie with it
-                            callback(null, result[0])
+                                // send existing token back to routing to make a cookie with it
+                            callback(null, result[0].token)
                         }
-                        
+
                     })
-                    
+
                 }
                 else {
                     // if success, return the token so that we can use for cookies
@@ -547,7 +555,7 @@ module.exports = function CredditAPI(conn) {
         getUserInfoFromSession: function(session, callback) {
             // does a match exist for token in users cookies
             // if yes, return all info for that user
-            
+
             var dbQuery = `
                 SELECT sessions.userId AS sessions_userId, sessions.token AS sessions_token, 
                 users.id AS users_id, users.username AS users_username
@@ -557,10 +565,11 @@ module.exports = function CredditAPI(conn) {
                 WHERE sessions.token = '${session}'
             `
             conn.query(dbQuery, function(err, result) {
-                console.log("QUERY ERR=============================", err)
-                console.log("QUERY RESULT=============================", result)
-                
+                // console.log("QUERY ERR=============================", err)
+                // console.log("QUERY RESULT=============================", result)
+
                 if (err) {
+                    // session not linked to a userId, unlikely to occur
                     callback(null, false);
                 }
                 else if (result.length === 0) {
@@ -569,14 +578,129 @@ module.exports = function CredditAPI(conn) {
                 }
                 else {
                     callback(null, result[0]);
-                }    
+                }
             })
-            
-        }
-        
-        
-        // insert new functions here
 
+        },
+
+        // displayAllPosts: function() {
+        //     // Goal is to return html when called
+
+        //     // return "result of displayAllPosts API function";
+        //     return this.getAllPosts(function(err, posts) {
+        //         // OPTIONS PER PAGE ARE DEFINED IN THIS Fn
+        //         // console.log("POSTS RESULT============================", posts)
+        //         // console.log("POSTS ERR============================", err)
+
+        //         // return "<h1>2222</h1>";
+        //         var htmlString = ""
+        //             // start with an empty string
+
+        //         // concatenate li strings, adding info about each post
+        //         posts.forEach(function(obj) {
+        //             htmlString = htmlString + `
+    
+        //         <li class="content-item">
+        //           <h2 class="content-item__title">
+        //               <a href="${obj.url}">${obj.title}</a>
+        //           </h2>
+        //               <p>Created ${moment(obj.createdAt).fromNow()}</p>
+        //         </li>`
+        //         })
+
+        //         // concatenate string by adding header and footer info
+        //         var htmlStr = `
+        //      <div id="contents">
+        //         <h1>List of All Posts</h1>
+        //         <ul class="contents-list">` + htmlString +
+        //             `</ul></div>
+        //     <form action="/" method="GET"> 
+      
+        //         <button type="submit">Back to Homepage</button>
+        //     </form>
+        //     `;
+        //         console.log("HTML STRING========================", htmlString)
+        //         return htmlStr;
+
+        //     })
+        // },
+        renderLayout: function(mainTitle, mainContent, userId, username) {
+        // this function wraps the inputted html in standard html
+        // last 2 arguments may not be passed if user is not logged in
+        // first need to define header to display depends on if user is logged in
+        
+            var header = `
+            <form action="/signup" method="GET"> 
+              <div>
+                Signup to create an account.
+              </div>
+              <button type="submit">Signup</button>
+            </form>
+            
+            <form action="/login" method="GET"> 
+              <div>
+                Login to your account
+              </div>
+              <button type="submit">Login</button>
+            </form>
+        `
+            
+            var headerLoggedIn = `
+            <h1>Hi ${username}!</h1>
+            <form action="/createContent" method="GET"> 
+              <div>
+                
+              </div>
+              <button type="submit">Create a POST</button>
+            </form>
+            
+            <form action="/posts/${userId}" method="GET"> 
+              <div>
+                
+              </div>
+              <button type="submit">Show only my posts</button>
+            </form>
+            
+            <form action="/logout" method="GET"> 
+              <div>
+                
+              </div>
+              <button type="submit">Logout</button>
+            </form>
+            
+        `
+
+            var masterHtml = `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>REDDIT CLONE </title>
+                    <link rel="stylesheet" href="style.css" type="text/css" />
+                </head>
+                <body>
+                    <header>
+                        <h1 class="main-logo">WELCOME TO REDDIT CLONE</h1>
+                        <nav>
+                        ${userId ? headerLoggedIn : header}
+                        </nav>
+                    </header>
+                    
+                    <main>  
+                        <h2>${mainTitle}</h2>
+                        ${mainContent}
+                    
+                    </main> 
+        
+                    <footer>FOOTER - Creddit &copy  </footer> 
+                </body>
+            </html>
+            `
+
+            return(masterHtml);
+
+        },
+
+        // insert new functions here
 
 
 
