@@ -124,16 +124,12 @@ app.get('/post/:postId', function(request, response) {
                   <h2 class="content-item__title">
                     <a href="${results[0].posts_url}">${results[0].posts_title}</a>
                   </h2>
-                  <!-- <p>Created by ${results[0].users_username}</p>
-                  <p>Created ${moment(results[0].posts_createdAt).fromNow()}</p> -->
+                  <p>Created by ${results[0].users_username}</p>
+                  <p>Created at ${moment(results[0].posts_createdAt).format("h:mm a")}</p>
                 </li>
               </ul>
             </div>
-            <form action="/" method="GET"> 
-              Good Job!
-                <button type="submit">Back to Homepage</button>
-            </form>
-            
+            <button><a href="/">Back to Homepage</a></button>
             `
 
         response.send(htmlString)
@@ -209,16 +205,43 @@ app.get('/posts/:userId*?', function(req, res) {
                      <div id="contents">
                         <ul class="contents-list">` + htmlString +
                     `</ul></div>
-                    <form action="/" method="GET"> 
-              
-                        <button type="submit">Back to Homepage</button>
-                    </form>
+                        <button><a href="/">Back to Homepage</a></button>
                     `;
                 res.send(credditAPI.renderLayout(`All posts for ${username}`, htmlString, userId, username));
                 // res.send(htmlString)
             };
         }
     })
+});
+
+
+// ------------------------------------------------------------------------------------
+app.get('/createContent/', function(request, response) {
+    // form where user creates a post
+    // modify to add subreddit drop down button
+    
+    var userId = request.loggedInUser ? request.loggedInUser.users_id : "";
+    var username = request.loggedInUser ? request.loggedInUser.users_username : "";
+    
+    var html = `
+        <form action="/createContent" method="POST"> 
+      <div>
+        <input type="text" name="url" placeholder="Enter a URL to content">
+      </div>
+      <div>
+        <input type="text" name="title" placeholder="Enter the title of your content">
+      </div>
+      <div>
+        <input type="text" name="subreddit" placeholder="Fixed at 2 for now">
+      </div>
+      <button type="submit">Create!</button>
+    </form>
+    
+    <button><a href="/">Cancel</a></button>
+    `
+    
+    response.send(credditAPI.renderLayout("Create Post", html, userId, username));
+    // when user types in url, they go to makepost.html
 });
 
 
@@ -254,28 +277,43 @@ app.get('/allposts', function(req, res) {
                     htmlString = htmlString + `
             
                         <li class="content-item">
-                          <h2 class="content-item__title">
-                              <a href="${obj.url}">${obj.title}</a>
-                          </h2>
-                              <p>Created by ${obj.users.username}</p>
-                              <p>Created ${moment(obj.createdAt).fromNow()}</p>
-                        </li>`
+                            <ul class="content-boxes">
+                                <li class="vote-box">
+                                    
+                                        <p><a href="">&#8679</a></p>
+                                        <p>999</p>
+                                        <p><a href="">&#8681</a></p>
+                                    
+                                </li>
+                                <li class="image-box">
+                                        <img src="http://placekitten.com/g/100/100"/>                                    
+                                    
+                                </li>
+                                <li class="info-box">
+                                    <h2 class="content-item__title">
+                                        <a href="${obj.url}">${obj.title}</a>
+                                    </h2>
+                                    <ul class="info-box-items">
+                                    <li class="created-by"><p>  Created by ${obj.users.username}</p></li>
+                                    <li class="date"><p>  Created ${moment(obj.createdAt).fromNow()}</p></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        `
                 })
 
                 // concatenate string by adding header and footer info
                 // add CHANGE PAGE FUNCTIONALITY--------------------------------------------------------------***** AJAX
                 // add CHANGE POSTS PER PAGE FUNCTIONALITY----------------------------------------------------***** AJAX
                 var htmlStr = `
-                     <div id="contents">
-                        <p>
-                        <a href=""><--</a>
-                        page ${req.displayOptions.page + 1}
-                        <a href="">--></a></p>
-                        
-                        <p>posts per page ${req.displayOptions.numPerPage}</p>
-                        
                         <ul class="contents-list">` + htmlString +
-                    `</ul></div>
+                    `</ul>
+                    
+                     <div id="page-display-options">
+                        <span>posts per page <a href="/postsperpage/">${req.displayOptions.numPerPage}</a>: </span>
+                        <a href="">NEXT PAGE>></a>
+                    </div>    
                     `;
                     // console.log("HTML STRING========================", htmlString)
                 res.send(credditAPI.renderLayout("All posts", htmlStr, userId, username))  // master send*******************
@@ -285,34 +323,26 @@ app.get('/allposts', function(req, res) {
 });
 
 // ------------------------------------------------------------------------------------
-app.get('/createContent/', function(request, response) {
+app.get('/postsperpage/', function(request, response) {
     // form where user creates a post
     // modify to add subreddit drop down button
     
-    var userId = request.loggedInUser ? request.loggedInUser.users_id : "";
-    var username = request.loggedInUser ? request.loggedInUser.users_username : "";
+    // var userId = request.loggedInUser ? request.loggedInUser.users_id : "";
+    // var username = request.loggedInUser ? request.loggedInUser.users_username : "";
     
-    var html = `
-        <form action="/createContent" method="POST"> 
-      <div>
-        <input type="text" name="url" placeholder="Enter a URL to content">
-      </div>
-      <div>
-        <input type="text" name="title" placeholder="Enter the title of your content">
-      </div>
-      <div>
-        <input type="text" name="subreddit' placeholder="Fixed at 2 for now">
-      </div>
-      <button type="submit">Create!</button>
-    </form>
+    // var html = `
+    //     <form action="/allposts" method="POST"> 
+    //   <div>
+    //     <input type="text" name="posts" placeholder="Number of posts per page">
+    //   </div>
+    //   <button type="submit">Go</button>
+    // </form>
     
-    <form action="/" method="GET"> 
-                  
-      <button type="submit">Cancel</button>
-    </form>
-    `
+    // <a href="/">Cancel</a>
+    // `
     
-    response.send(credditAPI.renderLayout("Create Post", html, userId, username));
+    
+    response.redirect('/allposts/');
     // when user types in url, they go to makepost.html
 })
 
@@ -365,10 +395,7 @@ app.get('/login', function(request, response) {
           </div>
           <button type="submit">Login</button>
         </form>
-        
-        <form action="/" method="GET"> 
-          <button type="submit">Cancel</button>
-        </form>
+        <button><a href="/">Cancel</a></button>
     `
     
     response.send(credditAPI.renderLayout("Login", htmlStr));
@@ -406,11 +433,7 @@ app.post('/login', function(request, response) {
               </div>
               <button type="submit">Try again</button>
             </form>
-            
-            <form action="/" method="GET"> 
-              
-              <button type="submit">Cancel</button>
-            </form>
+            <button><a href="/">Cancel</a></button>
         `
 
             response.send(credditAPI.renderLayout("Oops", htmlStr));
@@ -475,12 +498,7 @@ app.get('/signup', function(request, response) {
           </div>
           <button type="submit">Sign me up!</button>
         </form>
-        <form action="/" method="GET"> 
-              <div>
-                Back to homepage
-              </div>
-              <button type="submit">Cancel</button>
-            </form>
+        <button><a href="/">Cancel</a></button>
     `
 
     response.send(credditAPI.renderLayout("Signup", htmlStr));
@@ -505,13 +523,8 @@ app.post('/signup', function(request, response) {
               </div>
               <button type="submit">Try again</button>
             </form>
-            
-            <form action="/" method="GET"> 
-              <div>
-                Back to homepage
-              </div>
-              <button type="submit">Cancel</button>
-            </form>
+
+            <button><a href="/">Cancel</a></button>            
         `
 
             response.send(credditAPI.renderLayout("Oops", htmlStrTryAgain)); // redirect to try again

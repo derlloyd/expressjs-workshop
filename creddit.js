@@ -629,71 +629,103 @@ module.exports = function CredditAPI(conn) {
         // last 2 arguments may not be passed if user is not logged in
         // first need to define header to display depends on if user is logged in
         
-            var header = `
-            <form action="/signup" method="GET"> 
-              <div>
-                Signup to create an account.
-              </div>
-              <button type="submit">Signup</button>
-            </form>
             
-            <form action="/login" method="GET"> 
-              <div>
-                Login to your account
-              </div>
-              <button type="submit">Login</button>
-            </form>
+            // <form action="/signup" method="GET"> 
+            //   <div>
+            //     Signup to create an account.
+            //   </div>
+            //   <button type="submit">Signup</button>
+            // </form>
+            
+            // <form action="/login" method="GET"> 
+            //   <div>
+            //     Login to your account
+            //   </div>
+            //   <button type="submit">Login</button>
+            // </form>
+            // <form action="/createContent" method="GET"> 
+            //   <div>
+                
+            //   </div>
+            //   <button type="submit">Create a POST</button>
+            // </form>
+            
+            // <form action="/posts/${userId}" method="GET"> 
+            //   <div>
+                
+            //   </div>
+            //   <button type="submit">Show only my posts</button>
+            // </form>
+            
+            // <form action="/logout" method="GET"> 
+            //   <div>
+                
+            //   </div>
+            //   <button type="submit">Logout</button>
+            // </form>
+            
+            
+            var header = `
+            <ul>
+                <li><button><a href="/signup" style="text-decoration:none">Sign Up</a></button></li>
+                <li><button><a href="/login" style="text-decoration:none">Login</a></button></li>
+            </ul>
+        
         `
             
             var headerLoggedIn = `
-            <h1>Hi ${username}!</h1>
-            <form action="/createContent" method="GET"> 
-              <div>
-                
-              </div>
-              <button type="submit">Create a POST</button>
-            </form>
-            
-            <form action="/posts/${userId}" method="GET"> 
-              <div>
-                
-              </div>
-              <button type="submit">Show only my posts</button>
-            </form>
-            
-            <form action="/logout" method="GET"> 
-              <div>
-                
-              </div>
-              <button type="submit">Logout</button>
-            </form>
-            
+            <ul>
+                <li>Hi ${username}!</li>
+                <li><button><a href="/posts/${userId}" style="text-decoration:none">my posts</a></button></li>
+                <li><button><a href="/createContent" style="text-decoration:none">create post</a></button></li>
+                <li><button><a href="/logout" style="text-decoration:none">logout</a></button></li>
+            </ul>
         `
 
             var masterHtml = `
             <!DOCTYPE html>
             <html>
                 <head>
-                    <title>REDDIT CLONE </title>
-                    <link rel="stylesheet" href="style.css" type="text/css" />
+                    <title>reddit clone</title>
+                    <link rel="stylesheet" href="../style.css" type="text/css" />
                 </head>
                 <body>
-                    <header>
-                        <h1 class="main-logo">WELCOME TO REDDIT CLONE</h1>
-                        <nav>
-                        ${userId ? headerLoggedIn : header}
-                        </nav>
+                    <header class="subreddit-options-header">
+                    <nav><ul>
+                        <li>options1</li>
+                        <li>options2</li>
+                        <li>options3</li>
+                        <li>options4</li>
+                    </ul></nav>
+                    </header>
+                    <header class="logo-header">
+                        <ul class="logo-header-items">
+                            <li id="logo"><img src="../logo.png" alt="" height=50 width=50></li>
+                            <li id="title"><h1 class="main-logo">REDDIT CLONE</h1>
+                                <ul>
+                                <li><a href="">hot</a></li> 
+                                <li><a href="">new</a></li>
+                                <li><a href="">rising</a></li> 
+                                <li><a href="">controversial</a></li> 
+                                <li><a href="">top</a></li>
+                                </ul>
+                            </li>
+                            
+                            <li id="user-header">
+                                ${userId ? headerLoggedIn : header}
+                            </li>
+                        </ul>
                     </header>
                     
                     <main>  
-                        <h2>${mainTitle}</h2>
+                        <h1 class="main-content-title">${mainTitle}</h1>
                         ${mainContent}
                     
                     </main> 
         
-                    <footer>FOOTER - Creddit &copy  </footer> 
+                    <footer>--FOOTER--Creddit &copy</footer> 
                 </body>
-            </html>
+            </html> 
             `
 
             return(masterHtml);
