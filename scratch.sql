@@ -1,5 +1,75 @@
 
 
+add dropdown list to createcontent to select subredditId
+have subreddit header be auto generated from db query
+
+
+add functionality to change page number and change listings per page
+
+add comments to posts
+add voting table
+
+add sorting hot and new
+need to store votes for this
+
+reaact??
+
+
+
+verify if actually writing new value to request header when sorting method changed
+
+
+
+
+
+
+
+
+        SELECT posts.id AS posts_id, posts.title AS posts_title, 
+        posts.url AS posts_url, posts.createdAt AS posts_createdAt, 
+        posts.updatedAt AS posts_updatedAt, 
+        posts.userId AS posts_userId, posts.subredditId AS posts_subredditId,
+        
+        subreddits.id AS subreddit_id, subreddits.name AS subreddit_name,
+        subreddits.description AS subreddit_description, 
+        subreddits.createdAt AS subreddit_createdAt,
+        subreddits.updatedAt AS subreddit_updatedAt,
+        
+        users.id AS users_id, users.username AS users_username, 
+        users.createdAt AS users_createdAt, users.updatedAt AS users_updatedAt,
+        
+        SUM(votes.vote) AS voteScore
+        
+        FROM posts
+        JOIN users
+        ON posts.userId=users.id
+        JOIN subreddits
+        ON posts.subredditId=subreddits.id
+        LEFT JOIN votes
+        ON posts.id=votes.postId
+        GROUP BY posts.id
+        ORDER BY voteScore DESC,
+        posts.createdAt DESC
+        LIMIT 10
+
+
+        ORDER BY voteScore DESC,
+        posts.createdAt DESC
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ***REQUEST OBJECT*****
 
 sessions_userId: 20,
@@ -12,22 +82,75 @@ req.displayOptions.numPerPage
 
 
 
-
-
-
-add functionality to change page number and change listings per page
-
-add comments to posts
-add voting table
-
-add sorting
-
-reaact??
+alter table votes add `createdAt` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+alter table votes add updatedAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
 
 
 
+CREATE TABLE votes (
+postId INT, 
+userId INT, 
+vote TINYINT,
+createdAt DATETIME,
+updatedAt DATETIME
+)
 
+
+ALTER TABLE votes ADD PRIMARY KEY (postID, userId)
+
+ALTER TABLE votes ADD FOREIGN KEY ('postId') REFERENCES posts('id') ON DELETE CASCADE,
+ALTER TABLE votes ADD FOREIGN KEY (postId) REFERENCES posts(id)
+ALTER TABLE votes ADD FOREIGN KEY (userId) REFERENCES users(id)
+
+ALTER TABLE votes MODIFY column vote ENUM('-1', '0', '1')
+
+
+ALTER TABLE votes ADD COLUMN updatedAt DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+
+FOREIGN KEY (userId) REFERENCES users(id)
+
+ALTER TABLE votes ADD createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+
+ALTER TABLE `votes` ADD `updatedAt` TIMESTAMP 
+ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+
+--------------------
+
+ALTER TABLE `votes` ADD `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+ALTER TABLE `votes` ADD `updatedAt` TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP
+
+
+
+NOT NULL
+
+
+alter table votes add column updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+CREATE TABLE t1 (
+  ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  dt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE posts ADD FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE;
+
+INSERT INTO votes SET postId = 1, createdAt = null, userId = 1, vote = 1 ON DUPLICATE KEY UPDATE vote = 1 
+
+INSERT INTO votes SET postId = 1, createdAt = null, userId = 1, vote = -1 ON DUPLICATE KEY UPDATE vote = -1 
+
+
+
+INSERT INTO votes SET postId = 1, userId = 1, vote = -1 ON DUPLICATE KEY UPDATE vote = -1 
+INSERT INTO votes SET postId = 2, createdAt = null, userId = 1, vote = 0 ON DUPLICATE KEY UPDATE vote = 0 
+
+
+ALTER TABLE Chicken ADD COLUMN (breedId INT, FOREIGN KEY (breedId) REFERENCES Breed(breedId));
 
 
 CREATE TABLE sessions (

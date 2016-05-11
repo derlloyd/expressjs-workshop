@@ -67,19 +67,10 @@ body {
 /*-----------------------------------------------------------------child2*/
 /*this is the title of the site "REDDIT CLONE"*/
 #title {
-    justify-content: flex-start;
+    align-items: flex-end;
     flex-grow: 5;
     /*width: auto;*/
-    flex-direction: column;
-}
-
-/*li id title contains a ul of sort items*/
-#title ul {
-    /*display:flex;*/
-}
-
-#title ul li {
-    padding-right: 20px;
+    /*flex-direction: column;*/
 }
 
 
@@ -105,7 +96,8 @@ body {
 .main-logo {
     position: relative;
     font-size: 1.5em;
-    
+    padding: 0;
+    margin: 0;
 }
 /*-----------------------------------------------------------------child3*/
 #user-header {
@@ -124,8 +116,16 @@ body {
 
 
 /*---------------------------------------------------MAIN CONTENT ITEMS-------------------------------*/
-
 /*any content that generates in the main area*/
+
+/*this are the a tags that display sorting options above posts in allposts handler*/
+.sort-options {
+    border: 1px solid green;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+
 /*this is the title of the main area --ex. all posts*/
 .main-content-title {
     border: 1px solid black;
@@ -191,7 +191,9 @@ main
 .info-box {
     /*margin: auto;*/
     /*text-align: "left";*/
+    justify-content: space-around;
     padding: 0.5em;
+    /*border: 1px solid red;*/
 }
 
 
@@ -200,8 +202,7 @@ main
 }
 
 .info-box-items li {
-    
-    justify-content: space-around;
+    padding-right: 20px;
 }    
 
 /*all uls within the content*/
@@ -222,6 +223,7 @@ main ul {
 /*    font-size: 1.1em;*/
 /*}*/
 /*----------------------------------------------------------------------FORMS----------------------------------*/
+
 form {
     line-height: 2em;
     
@@ -233,10 +235,46 @@ input, textarea {
   border  : 2px solid lightblue;
   /*padding : 0 10px;*/
   margin  : 0;
-  width   : 500px;
   height: 2em;
 
   /*background: none;*/
+}
+
+.signup-form {
+  width   : inherit;
+    
+    
+}
+
+.login-form {
+  width   : inherit;
+    
+    
+}
+
+
+.newpost-form {
+  width   : inherit;
+    
+    
+}
+
+/*----------------------------------------------------------------------UNICODE ARROWS--------------------------*/
+.unicode-up {
+    font-size: 1.5em;
+    /*font-stretch: expanded;*/
+    text-decoration: none;
+}
+
+.unicode-down {
+    font-size: 1.5em;
+    text-decoration: none;
+    
+/*-webkit-transform: rotateX(90deg);*/
+/*   -moz-transform: rotateX(90deg);*/
+/*    -ms-transform: rotateX(90deg);*/
+/*     -o-transform: rotateX(90deg);*/
+/*        transform: rotateX(90deg);*/
 }
 
 
@@ -252,7 +290,7 @@ button {
   border       : 1px solid black;
   border-radius: 5px;
   /*background   : none;*/
-  width: 100px;
+  width: inherit;
     margin-top: 1em;
   /*cursor       : pointer;*/
 
@@ -270,8 +308,9 @@ button:after {
 button:hover,
 button:focus {
   outline   : none;
-  background: #000;
-  color   : #FFF;
+  background: white;
+  /*color   : blue;*/
+  /*color   : #FFF;*/
 }
 
 

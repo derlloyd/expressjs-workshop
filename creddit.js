@@ -94,7 +94,7 @@ module.exports = function CredditAPI(conn) {
                 }
             );
         },
-        getAllPosts: function(options, callback) {
+        getAllPosts: function(options, sortingMethod, callback) {
             // In case we are called without an options parameter, shift all the parameters manually
             if (!callback) {
                 callback = options;
@@ -102,6 +102,20 @@ module.exports = function CredditAPI(conn) {
             }
             var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
             var offset = (options.page || 0) * limit;
+
+            // do we sort the posts by newest or highest vote count?
+            if(sortingMethod === "new") {
+                // sort by newest only
+                var sort = " posts.createdAt DESC"
+            }
+            else if (sortingMethod === "hot") {
+                // sort highest voteScore, then by date, default
+                var sort = " voteScore DESC, posts.createdAt DESC" 
+            } 
+            else {
+                // default = hot
+                var sort = " voteScore DESC, posts.createdAt DESC" 
+            }
 
             conn.query(`
         SELECT posts.id AS posts_id, posts.title AS posts_title, 
@@ -115,13 +129,19 @@ module.exports = function CredditAPI(conn) {
         subreddits.updatedAt AS subreddit_updatedAt,
         
         users.id AS users_id, users.username AS users_username, 
-        users.createdAt AS users_createdAt, users.updatedAt AS users_updatedAt
+        users.createdAt AS users_createdAt, users.updatedAt AS users_updatedAt,
+        
+        SUM(votes.vote) AS voteScore
+        
         FROM posts
         JOIN users
         ON posts.userId=users.id
         JOIN subreddits
         ON posts.subredditId=subreddits.id
-        ORDER BY posts.createdAt DESC
+        LEFT JOIN votes
+        ON posts.id=votes.postId
+        GROUP BY posts.id
+        ORDER BY ${sort}
         LIMIT ? OFFSET ?
         `, [limit, offset],
                 function(err, results) {
@@ -149,6 +169,7 @@ module.exports = function CredditAPI(conn) {
                             rObj.subreddit.description = obj.subreddit_description;
                             rObj.subreddit.createdAt = obj.createdAt;
                             rObj.subreddit.updatedAt = obj.updatedAt;
+                            rObj.voteScore = obj.voteScore;
                             return rObj;
                         }));
                     }
@@ -630,41 +651,6 @@ module.exports = function CredditAPI(conn) {
         // first need to define header to display depends on if user is logged in
         
             
-            // <form action="/signup" method="GET"> 
-            //   <div>
-            //     Signup to create an account.
-            //   </div>
-            //   <button type="submit">Signup</button>
-            // </form>
-            
-            // <form action="/login" method="GET"> 
-            //   <div>
-            //     Login to your account
-            //   </div>
-            //   <button type="submit">Login</button>
-            // </form>
-            // <form action="/createContent" method="GET"> 
-            //   <div>
-                
-            //   </div>
-            //   <button type="submit">Create a POST</button>
-            // </form>
-            
-            // <form action="/posts/${userId}" method="GET"> 
-            //   <div>
-                
-            //   </div>
-            //   <button type="submit">Show only my posts</button>
-            // </form>
-            
-            // <form action="/logout" method="GET"> 
-            //   <div>
-                
-            //   </div>
-            //   <button type="submit">Logout</button>
-            // </form>
-            
-            
             var header = `
             <ul>
                 <li><button><a href="/signup" style="text-decoration:none">Sign Up</a></button></li>
@@ -692,25 +678,18 @@ module.exports = function CredditAPI(conn) {
                 <body>
                     <header class="subreddit-options-header">
                     <nav><ul>
-                        <li>options1</li>
-                        <li>options2</li>
-                        <li>options3</li>
-                        <li>options4</li>
+                        <li>subredd1</li>
+                        <li>subredd2</li>
+                        <li>subredd3</li>
+                        <li>subredd4</li>
                     </ul></nav>
                     </header>
                     <header class="logo-header">
                         <ul class="logo-header-items">
+                            <a href="/">
                             <li id="logo"><img src="../logo.png" alt="" height=50 width=50></li>
-                            <li id="title"><h1 class="main-logo">REDDIT CLONE</h1>
-                                <ul>
-                                <li><a href="">hot</a></li> 
-                                <li><a href="">new</a></li>
-                                <li><a href="">rising</a></li> 
-                                <li><a href="">controversial</a></li> 
-                                <li><a href="">top</a></li>
-                                </ul>
-                            </li>
-                            
+                            </a>
+                            <li id="title"><h1 class="main-logo">REDDIT CLONE</h1></li>
                             <li id="user-header">
                                 ${userId ? headerLoggedIn : header}
                             </li>
@@ -731,7 +710,29 @@ module.exports = function CredditAPI(conn) {
             return(masterHtml);
 
         },
-
+        createOrUpdateVote: function(vote, callback) {
+            var dbQuery = `
+            INSERT INTO votes SET 
+            postId = ${vote.postId}, 
+            userId = ${vote.userId}, 
+            createdAt = null, 
+            vote = ${vote.vote} 
+            ON DUPLICATE 
+            KEY UPDATE vote = ${vote.vote} 
+            `
+            conn.query(dbQuery, function(err, result) {
+                    if (err) {
+                        callback(err);
+                    }
+                    else {
+                        /*
+                        vote inserted successfully.
+                        */
+                        callback(null, result)
+                    }
+                }
+            );
+        },
         // insert new functions here
 
 

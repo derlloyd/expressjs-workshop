@@ -35,6 +35,7 @@ app.use(function(request, response, next) {
     if (!request.displayOptions) {
         
         var displayOptions = {
+            sortAllPosts: "hot",
             numPerPage: 10,
             page: 0 
         }
@@ -74,23 +75,12 @@ app.use(function(request, response, next) {
         })
     }
 
-    // callback next to indicate that finished
-    // next();
-
 })
 
 // ------------------------------REQUEST HANDLERS--------------------------------------
 // ------------------------------------------------------------------------------------
 
 app.get('/', function(req, res) {
-    // MAIN PAGE, if user logged in, pass info to render function which will
-    // display custom header
-    
-
-    // var userId = req.loggedInUser ? req.loggedInUser.userId : "";
-    // var username = req.loggedInUser ? req.loggedInUser.users_username : "";
-    
-    // res.send(credditAPI.renderLayout("All posts", credditAPI.getAllPosts(), userId, username));
     
     res.redirect('/allposts');
 
@@ -98,6 +88,11 @@ app.get('/', function(req, res) {
 
 // ------------------------------------------------------------------------------------
 app.get('/post/:postId', function(request, response) {
+
+
+    var userId = request.loggedInUser ? request.loggedInUser.users_id : "";
+    var username = request.loggedInUser ? request.loggedInUser.users_username : "";
+
 
     var id = request.params.postId
         // console.log("POST ID--------------------", id);
@@ -112,7 +107,6 @@ app.get('/post/:postId', function(request, response) {
                 // error
         }
 
-        // send html string result to user
         // console.log("REUSLTS-------------------", results[0])
         // console.log("REUSLTS url-------------------", results[0].url)
 
@@ -129,11 +123,24 @@ app.get('/post/:postId', function(request, response) {
                 </li>
               </ul>
             </div>
-            <button><a href="/">Back to Homepage</a></button>
+            
+        <form action="/vote" method="POST"> 
+            <input type="text" name="postId" value=${results[0].posts_id}>
+            <input type="text" name="userId" value=${userId}>
+            <input type="text" name="vote" value='1'>
+          <button type="submit">UPVOTE</button>
+        </form>
+        
+        <form action="/vote" method="POST"> 
+            <input type="text" name="postId" value=${results[0].posts_id}>
+            <input type="text" name="userId" value=${userId}>
+            <input type="text" name="vote" value='-1'>
+          <button type="submit">DOWNVOTE</button>
+        </form>
+            
+            <button><a href="/" style="text-decoration:none">Back</a></button>
             `
-
-        response.send(htmlString)
-
+        response.send(credditAPI.renderLayout(`New post`, htmlString, userId, username));
 
     })
 })
@@ -163,8 +170,8 @@ app.get('/posts/:userId*?', function(req, res) {
     
     credditAPI.getAllPostsForUser(req.loggedInUser.users_id, function(err, posts) {
         // OPTIONS PER PAGE ARE DEFINED IN THIS Fn
-        console.log("POSTS RESULT============================", posts)
-        console.log("POSTS ERR============================", err)
+        // console.log("POSTS RESULT============================", posts)
+        // console.log("POSTS ERR============================", err)
         if (err) {
             // 500 is a server error, query didnt work
             // res.status(500).send('Query failed');
@@ -174,7 +181,7 @@ app.get('/posts/:userId*?', function(req, res) {
         else {
             if (posts.length === 0) {
                  htmlString = `
-                    <form action="/createContent" method="GET"> 
+                    <form class="newpost-form" action="/createContent" method="GET"> 
                         <div>
                             You have no posts yet.
                         </div>
@@ -205,8 +212,9 @@ app.get('/posts/:userId*?', function(req, res) {
                      <div id="contents">
                         <ul class="contents-list">` + htmlString +
                     `</ul></div>
-                        <button><a href="/">Back to Homepage</a></button>
+                        <button><a href="/">Back</a></button>
                     `;
+                
                 res.send(credditAPI.renderLayout(`All posts for ${username}`, htmlString, userId, username));
                 // res.send(htmlString)
             };
@@ -224,7 +232,7 @@ app.get('/createContent/', function(request, response) {
     var username = request.loggedInUser ? request.loggedInUser.users_username : "";
     
     var html = `
-        <form action="/createContent" method="POST"> 
+        <form class="newpost-form" action="/createContent" method="POST"> 
       <div>
         <input type="text" name="url" placeholder="Enter a URL to content">
       </div>
@@ -237,7 +245,7 @@ app.get('/createContent/', function(request, response) {
       <button type="submit">Create!</button>
     </form>
     
-    <button><a href="/">Cancel</a></button>
+    <button><a href="/" style="text-decoration: none">Cancel</a></button>
     `
     
     response.send(credditAPI.renderLayout("Create Post", html, userId, username));
@@ -247,16 +255,42 @@ app.get('/createContent/', function(request, response) {
 
 
 // ------------------------------------------------------------------------------------
-app.get('/allposts', function(req, res) {
+app.get('/allposts/:sort*?', function(req, res) {
 
     var userId = req.loggedInUser ? req.loggedInUser.users_id : "";
     var username = req.loggedInUser ? req.loggedInUser.users_username : "";
-
+    
+    // user can enter a parameter after the res path, value is store as req.params.sort
+    // console.log("REQUEST PARAMETERS=========================================================",req.params.sort)
+    // default sortMethod is stored in the global request header from the middleware req.displayOptions.sortAllPosts
+    // console.log("PREVIOUS GLOBAL DISPLAY OPTION==================================================",req.displayOptions.sortAllPosts)
+    // if a sort path is entered that corresponds to sorting method, change global request header
+    // and call getAllPosts function with that sortingMethod
+    
+    if (req.params.sort === "new") {
+        var sortBy = "new";
+        req.displayOptions.sortAllPosts = "new";
+    } 
+    else if (req.params.sort === "hot") {
+        var sortBy = "hot";
+        req.displayOptions.sortAllPosts = "hot";
+    } 
+    else {
+        // if no sort value specified, or if an unmatched sort value entered
+        // use the one saved in the header
+        var sortBy = req.displayOptions.sortAllPosts
+    }
+    
+    // console.log("================================================================")
+    // console.log("NEW SORT METHOD================================================================", sortBy)
+    // console.log("NEW GLOBAL DISPLAY OPTION==================================================",req.displayOptions.sortAllPosts)
+    
+    
     // OPTIONS for number of posts per page and current page are in this API function
-    credditAPI.getAllPosts(req.displayOptions, function(err, posts) {
+    credditAPI.getAllPosts(req.displayOptions, sortBy, function(err, posts) {
         // OPTIONS PER PAGE ARE DEFINED IN THIS Fn
-        console.log("POSTS RESULT============================", posts)
-        console.log("POSTS ERR============================", err)
+        // console.log("POSTS RESULT============================", posts)
+        // console.log("POSTS ERR============================", err)
         
         if (err) {
             // query error
@@ -272,21 +306,24 @@ app.get('/allposts', function(req, res) {
                 var htmlString = ""
                     // start with an empty string
                     
+                                        // <p><a href="">&#8679</a></p> 8681 9947 10809other unicode arrows
+                    
                 // concatenate li strings, adding info about each post
                 posts.forEach(function(obj) {
+                    var voteCount = obj.voteScore ? obj.voteScore : "-";
                     htmlString = htmlString + `
             
                         <li class="content-item">
                             <ul class="content-boxes">
                                 <li class="vote-box">
                                     
-                                        <p><a href="">&#8679</a></p>
-                                        <p>999</p>
-                                        <p><a href="">&#8681</a></p>
+                                        <p><a href="" class="unicode-up">&#8679</a></p>
+                                        <p>${voteCount}</p>
+                                        <p><a href="" class="unicode-down">&#8681</a></p>
                                     
                                 </li>
                                 <li class="image-box">
-                                        <img src="http://placekitten.com/g/100/100"/>                                    
+                                        <a href="/post/${obj.id}"><img src="http://placekitten.com/g/100/100"/></a>                                    
                                     
                                 </li>
                                 <li class="info-box">
@@ -294,8 +331,9 @@ app.get('/allposts', function(req, res) {
                                         <a href="${obj.url}">${obj.title}</a>
                                     </h2>
                                     <ul class="info-box-items">
-                                    <li class="created-by"><p>  Created by ${obj.users.username}</p></li>
-                                    <li class="date"><p>  Created ${moment(obj.createdAt).fromNow()}</p></li>
+                                    <li class="post-id"><p>${obj.id}</p></li>
+                                    <li class="date"><p>Created ${moment(obj.createdAt).fromNow()}</p></li>
+                                    <li class="created-by"><p>by ${obj.users.username}</p></li>
                                     </ul>
                                 </li>
                             </ul>
@@ -306,7 +344,12 @@ app.get('/allposts', function(req, res) {
                 // concatenate string by adding header and footer info
                 // add CHANGE PAGE FUNCTIONALITY--------------------------------------------------------------***** AJAX
                 // add CHANGE POSTS PER PAGE FUNCTIONALITY----------------------------------------------------***** AJAX
+                
                 var htmlStr = `
+                        
+                        <a class="sort-options" href="/allposts/hot">hot</a>
+                        <a class="sort-options" href="/allposts/new">new</a>
+                
                         <ul class="contents-list">` + htmlString +
                     `</ul>
                     
@@ -316,7 +359,7 @@ app.get('/allposts', function(req, res) {
                     </div>    
                     `;
                     // console.log("HTML STRING========================", htmlString)
-                res.send(credditAPI.renderLayout("All posts", htmlStr, userId, username))  // master send*******************
+                res.send(credditAPI.renderLayout("All posts", htmlStr, userId, username));
             };
         }
     })
@@ -324,26 +367,10 @@ app.get('/allposts', function(req, res) {
 
 // ------------------------------------------------------------------------------------
 app.get('/postsperpage/', function(request, response) {
-    // form where user creates a post
-    // modify to add subreddit drop down button
     
-    // var userId = request.loggedInUser ? request.loggedInUser.users_id : "";
-    // var username = request.loggedInUser ? request.loggedInUser.users_username : "";
-    
-    // var html = `
-    //     <form action="/allposts" method="POST"> 
-    //   <div>
-    //     <input type="text" name="posts" placeholder="Number of posts per page">
-    //   </div>
-    //   <button type="submit">Go</button>
-    // </form>
-    
-    // <a href="/">Cancel</a>
-    // `
-    
+    // do something here that lets the user change the display options ************************************ TBD
     
     response.redirect('/allposts/');
-    // when user types in url, they go to makepost.html
 })
 
 
@@ -357,7 +384,7 @@ app.post('/createContent/', function(request, response) {
     var post = {
         title: request.body.title,
         url: request.body.url,
-        subredditId: 2, // for now *********************************************************************
+        subredditId: 2, // for now ********************************************************************* TBD
         userId: request.loggedInUser.users_id
     }
 
@@ -386,7 +413,7 @@ app.post('/createContent/', function(request, response) {
 app.get('/login', function(request, response) {
 
     var htmlStr = `
-        <form action="/login" method="POST"> 
+        <form class="login-form" action="/login" method="POST"> 
           <div>
             <input type="text" name="username" placeholder="Enter your username">
           </div>
@@ -395,7 +422,7 @@ app.get('/login', function(request, response) {
           </div>
           <button type="submit">Login</button>
         </form>
-        <button><a href="/">Cancel</a></button>
+        <button><a href="/" style="text-decoration:none">Cancel</a></button>
     `
     
     response.send(credditAPI.renderLayout("Login", htmlStr));
@@ -427,13 +454,13 @@ app.post('/login', function(request, response) {
             // for some reason, not able to login
 
             var htmlStr = `
-            <form action="/login" method="GET"> 
+            <form class="login-form" action="/login" method="GET"> 
               <div>
                 Username or password error.
               </div>
               <button type="submit">Try again</button>
             </form>
-            <button><a href="/">Cancel</a></button>
+            <button><a href="/" style="text-decoration:none">Cancel</a></button>
         `
 
             response.send(credditAPI.renderLayout("Oops", htmlStr));
@@ -473,12 +500,7 @@ app.post('/login', function(request, response) {
             }
         })
 
-
-
         // if login is ok, redirect user to a list of their posts
-
-
-
 
     })
 
@@ -489,7 +511,7 @@ app.post('/login', function(request, response) {
 app.get('/signup', function(request, response) {
 
     var htmlStr = `
-        <form action="/signup" method="POST"> 
+        <form class="signup-form" action="/signup" method="POST"> 
           <div>
             <input type="text" name="username" placeholder="Create your username">
           </div>
@@ -498,7 +520,7 @@ app.get('/signup', function(request, response) {
           </div>
           <button type="submit">Sign me up!</button>
         </form>
-        <button><a href="/">Cancel</a></button>
+        <button><a href="/" style="text-decoration:none">Cancel</a></button>
     `
 
     response.send(credditAPI.renderLayout("Signup", htmlStr));
@@ -524,7 +546,7 @@ app.post('/signup', function(request, response) {
               <button type="submit">Try again</button>
             </form>
 
-            <button><a href="/">Cancel</a></button>            
+            <button><a href="/" style="text-decoration:none">Cancel</a></button>            
         `
 
             response.send(credditAPI.renderLayout("Oops", htmlStrTryAgain)); // redirect to try again
@@ -560,7 +582,6 @@ app.post('/signup', function(request, response) {
 
             })
 
-            // redirect to homepage
         }
 
     })
@@ -577,6 +598,40 @@ app.get('/logout', function(request, response) {
     response.redirect('/');
 })
 
+
+
+// ------------------------------------------------------------------------------------
+
+app.post('/vote', function(request, response) {
+    
+    var vote = {
+        userId: request.body.userId,
+        postId: request.body.postId,
+        vote: request.body.vote
+    }
+
+    credditAPI.createOrUpdateVote(vote, function(err, result) {
+        if (err) {
+            console.log("ERROR after VOTE--------------------", err)
+
+            var htmlStrTryAgain = `
+            <p>Sign up or Login to vote</p>
+            <button><a href="/" style="text-decoration:none">Back</a></button>            
+        `
+
+            response.send(credditAPI.renderLayout("Oops", htmlStrTryAgain)); 
+            // if error, redirect to homepage with empty main area
+        }
+        else {
+            // console.log("VOTE CREATE RESULT*********************************************", result)
+            // console.log("VOTE CREATED------------------**********************************************")
+            response.redirect('/');
+            // redirect to homepage
+        }
+
+    })
+
+})
 
 
 
