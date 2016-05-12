@@ -702,7 +702,11 @@ module.exports = function CredditAPI(conn) {
                     
                     </main> 
         
-                    <footer>--FOOTER--Creddit &copy</footer> 
+                    <footer>--FOOTER--Creddit &copy</footer>
+                    <script src="https://code.jquery.com/jquery-1.12.3.js"></script>
+                    <script>
+                    
+                    </script>
                 </body>
             </html> 
             `

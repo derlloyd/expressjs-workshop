@@ -255,23 +255,23 @@ app.get('/createContent/', function(request, response) {
 
 
 // ------------------------------------------------------------------------------------
-app.get('/allposts/:sort*?', function(req, res) {
-
+app.get('/allposts', function(req, res) {
+// if user enters ?sort=value after url, key value pair stored in request
     var userId = req.loggedInUser ? req.loggedInUser.users_id : "";
     var username = req.loggedInUser ? req.loggedInUser.users_username : "";
     
-    // user can enter a parameter after the res path, value is store as req.params.sort
-    // console.log("REQUEST PARAMETERS=========================================================",req.params.sort)
+    // user can enter a search argument after the res path, value is store as req.query.sort
+    // console.log("REQUEST QUERY=========================================================",req.query.sort)
     // default sortMethod is stored in the global request header from the middleware req.displayOptions.sortAllPosts
     // console.log("PREVIOUS GLOBAL DISPLAY OPTION==================================================",req.displayOptions.sortAllPosts)
     // if a sort path is entered that corresponds to sorting method, change global request header
     // and call getAllPosts function with that sortingMethod
     
-    if (req.params.sort === "new") {
+    if (req.query.sort === "new") {
         var sortBy = "new";
         req.displayOptions.sortAllPosts = "new";
     } 
-    else if (req.params.sort === "hot") {
+    else if (req.query.sort === "hot") {
         var sortBy = "hot";
         req.displayOptions.sortAllPosts = "hot";
     } 
@@ -306,7 +306,7 @@ app.get('/allposts/:sort*?', function(req, res) {
                 var htmlString = ""
                     // start with an empty string
                     
-                                        // <p><a href="">&#8679</a></p> 8681 9947 10809other unicode arrows
+                                        // &#8679 8681 9947 10809other unicode arrows
                     
                 // concatenate li strings, adding info about each post
                 posts.forEach(function(obj) {
@@ -317,24 +317,32 @@ app.get('/allposts/:sort*?', function(req, res) {
                             <ul class="content-boxes">
                                 <li class="vote-box">
                                     
-                                        <p><a href="" class="unicode-up">&#8679</a></p>
+                                        <p><a href="" class="vote-up">&#8679</a></p>
                                         <p>${voteCount}</p>
-                                        <p><a href="" class="unicode-down">&#8681</a></p>
+                                        <p><a href="" class="vote-down">&#8681</a></p>
                                     
                                 </li>
                                 <li class="image-box">
-                                        <a href="/post/${obj.id}"><img src="http://placekitten.com/g/100/100"/></a>                                    
+                                        <a href="/post/${obj.id}"><img src="https://placekitten.com/g/100/100"/></a>                                    
                                     
                                 </li>
                                 <li class="info-box">
-                                    <h2 class="content-item__title">
-                                        <a href="${obj.url}">${obj.title}</a>
-                                    </h2>
-                                    <ul class="info-box-items">
-                                    <li class="post-id"><p>${obj.id}</p></li>
-                                    <li class="date"><p>Created ${moment(obj.createdAt).fromNow()}</p></li>
-                                    <li class="created-by"><p>by ${obj.users.username}</p></li>
-                                    </ul>
+                                    <ul>
+                                        <li>
+                                        <h2 class="content-item__title">
+                                            <a href="${obj.url}">${obj.title}</a>
+                                        </h2>
+                                        </li>
+                                        <li><a href="">/r/${obj.subreddit.name}</a></li>
+                                        
+                                        <li>
+                                        <ul class="info-box-items">
+                                            <li class="date"><p>Created ${moment(obj.createdAt).fromNow()}</p></li>
+                                            <li class="created-by"><p>by ${obj.users.username}</p></li>
+                                            <li class="post-id"><p>post:${obj.id} - (${obj.url})</p></li>
+                                        </ul>
+                                        </li>
+                                    </ul>    
                                 </li>
                             </ul>
                         </li>
@@ -347,8 +355,8 @@ app.get('/allposts/:sort*?', function(req, res) {
                 
                 var htmlStr = `
                         
-                        <a class="sort-options" href="/allposts/hot">hot</a>
-                        <a class="sort-options" href="/allposts/new">new</a>
+                        <a class="sort-options" href="/allposts?sort=hot">hot</a>
+                        <a class="sort-options" href="/allposts?sort=new">new</a>
                 
                         <ul class="contents-list">` + htmlString +
                     `</ul>

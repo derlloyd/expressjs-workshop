@@ -123,6 +123,7 @@ body {
     border: 1px solid green;
     padding-left: 30px;
     padding-right: 30px;
+    margin-bottom: 0;
 }
 
 
@@ -157,6 +158,7 @@ main
     border: 1px solid green;
     list-style: none;
     padding-left: 0;
+    margin-top: 0;
     /*display: flex;*/
     /*flex-direction: row;*/
 }
@@ -259,17 +261,18 @@ input, textarea {
     
 }
 
-/*----------------------------------------------------------------------UNICODE ARROWS--------------------------*/
-.unicode-up {
+/*----------------------------------------------------------------------A TAG UNICODE ARROWS--------------------------*/
+.vote-up {
     font-size: 1.5em;
     /*font-stretch: expanded;*/
     text-decoration: none;
 }
 
-.unicode-down {
+.vote-down {
     font-size: 1.5em;
     text-decoration: none;
-    
+    color: blue;
+    text-decoration: bold;
 /*-webkit-transform: rotateX(90deg);*/
 /*   -moz-transform: rotateX(90deg);*/
 /*    -ms-transform: rotateX(90deg);*/
@@ -283,7 +286,7 @@ button {
   /*position     : absolute;*/
   /*left         : 440px;*/
   /*top          : 360px;*/
-    text-decoration: none;
+  text-decoration: none;
   padding      : 5px;
 
   /*font         : bold .6em sans-serif;*/
@@ -291,7 +294,7 @@ button {
   border-radius: 5px;
   /*background   : none;*/
   width: inherit;
-    margin-top: 1em;
+  margin-top: 1em;
   /*cursor       : pointer;*/
 
 /*-webkit-transform: rotate(-1.5deg);*/
