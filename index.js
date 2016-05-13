@@ -23,6 +23,8 @@ var moment = require('moment')
 
 app.use(express.static("public"));
 
+var request = require('request');
+
 // ------------------------------MIDDLEWARE--------------------------------------------
 // ------------------------------------------------------------------------------------
 
@@ -248,18 +250,20 @@ app.get('/createContent/', function(request, response) {
     </form>
     
     <button><a href="/" style="text-decoration: none">Cancel</a></button>
-    <script src="https://code.jquery.com/jquery-1.12.3.js"></script>
     <script>
+        console.log("WITHIN CREATE CONTENT")
     
         function createContentScript() {
-          $(.the-title).val('xyz');  
-        console.log("WITHIN CREATE CONTENT")
+          $('.the-title').val('xyz123');  
     }
     
     
     </script>
     
     `
+    // don't need to call jquery here because it is being called before the footer of the main html
+    // function is being called when document ready
+    // <script src="https://code.jquery.com/jquery-1.12.3.js"></script>
     
     response.send(credditAPI.renderLayout("Create Post", html, userId, username));
     // when user types in url, they go to makepost.html
@@ -307,7 +311,7 @@ app.get('/allposts', function(req, res) {
     }
     if (req.query.user) {
         filter.user = req.query.user;
-        displayFilter = "  filtered by user"
+        displayFilter = "filtered by user"
     }
     // console.log("FILTER''''''''''''''''''''==================", filter)
     // console.log("================================================================")
@@ -383,10 +387,10 @@ app.get('/allposts', function(req, res) {
                 // add CHANGE POSTS PER PAGE FUNCTIONALITY----------------------------------------------------***** AJAX
                 
                 var htmlStr = `
-                        
+                        ${displaySorted}<br>
                         <a class="sort-options" href="/allposts?sort=hot">hot</a>
                         <a class="sort-options" href="/allposts?sort=new">new</a>
-                        ${displaySorted}${displayFilter}
+                        ${displayFilter}
                         <ul class="contents-list">` + htmlString +
                     `</ul>
                     
@@ -670,7 +674,36 @@ app.post('/vote', function(request, response) {
 
 })
 
-
+app.get('/getTitle', function(req, res) {
+    // when someone goes to main site/getTitle?url=xxxxx.com
+    // url value is stored in request query as request.query.url, use req to not conflict with web request
+    
+    var url = req.query.url;
+    
+    // feed the url provided by user to request to get some info
+    request(url, function(err, result) {
+        if (err) {
+            res.send("url error")
+        }
+        else {
+            //if there's a result, this is the html body of the url
+            var body = result.body;
+            
+            // feed html to this function to return the info between the title tags
+            
+            // set delay on return so that i can work on loading notifications
+            setTimeout(function(){
+                res.send(credditAPI.getTitleFromHtml(body))
+            }, 2500)
+            
+            
+        }
+        
+    })
+    
+    
+    
+})
 
 
 // ------------------------------------------------------------------------------------

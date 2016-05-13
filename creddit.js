@@ -195,70 +195,70 @@ module.exports = function CredditAPI(conn) {
                 }
             );
         },
-        getAllPostsForUser: function(userId, options, callback) {
-            // In case we are called without an options parameter, shift all the parameters manually
+        // getAllPostsForUser: function(userId, options, callback) {
+        //     // In case we are called without an options parameter, shift all the parameters manually
             
-            if (!callback) {
-                callback = options;
-                options = {};
-            }
-            var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
-            var offset = (options.page || 0) * limit;
+        //     if (!callback) {
+        //         callback = options;
+        //         options = {};
+        //     }
+        //     var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
+        //     var offset = (options.page || 0) * limit;
 
-            var sqlQuery = `
-        SELECT posts.id AS posts_id, posts.title AS posts_title, 
-        posts.url AS posts_url, posts.createdAt AS posts_createdAt, 
-        posts.updatedAt AS posts_updatedAt, posts.userId AS posts_userId,
-        users.id AS users_id, users.username AS users_username, 
-        users.createdAt AS users_createdAt, users.updatedAt AS users_updatedAt
-        FROM posts
-        JOIN users
-        ON posts.userId=users.id
-        WHERE users.id=${userId}  
+        //     var sqlQuery = `
+        // SELECT posts.id AS posts_id, posts.title AS posts_title, 
+        // posts.url AS posts_url, posts.createdAt AS posts_createdAt, 
+        // posts.updatedAt AS posts_updatedAt, posts.userId AS posts_userId,
+        // users.id AS users_id, users.username AS users_username, 
+        // users.createdAt AS users_createdAt, users.updatedAt AS users_updatedAt
+        // FROM posts
+        // JOIN users
+        // ON posts.userId=users.id
+        // WHERE users.id=${userId}  
         
-        ORDER BY posts.createdAt DESC
-        LIMIT ? OFFSET ?
-        `
-            conn.query(sqlQuery, [limit, offset],
-                function(err, results) {
-                    console.log("conn query result----------------------------------------", results)
-                    console.log("conn query err----------------------------------------", err)
+        // ORDER BY posts.createdAt DESC
+        // LIMIT ? OFFSET ?
+        // `
+        //     conn.query(sqlQuery, [limit, offset],
+        //         function(err, results) {
+        //             console.log("conn query result----------------------------------------", results)
+        //             console.log("conn query err----------------------------------------", err)
 
 
-                    if (err) {
-                        console.log("conn query if err----------------------------------------", err)
+        //             if (err) {
+        //                 console.log("conn query if err----------------------------------------", err)
 
-                        callback(err);
-                    }
-                    // else if (results.length === 0) {
-                    //     console.log("conn query if err----------------------------------------", err)
-                    //     console.log("User ID does not exist");
-                    //     callback(err);
-                    //     return;
-                    // }
-                    else {
-                        // callback(results.map(function(obj) {
-                        //   var rObj = {};
-                        //   rObj.id = obj.posts_id;
-                        //   rObj.title = obj.posts_title;
-                        //   rObj.url = obj.posts_url;
-                        //   rObj.createdAt = obj.posts_createdAt;
-                        //   rObj.updatedAt = obj.posts_updatedAt;
-                        //   rObj.userId = obj.posts_userId;
-                        //   rObj.users = {}
-                        //       rObj.users.id = obj.users_id;
-                        //       rObj.users.username = obj.users_username;
-                        //       rObj.users.createdAt = obj.users_createdAt;
-                        //       rObj.users.updatedAt = obj.users_updatedAt;
-                        //   return rObj;
-                        // }));
-                        // console.log("RESULT OF FUNCTON---------------xxxxxxxxxxxxxxx----------", results)
-                        callback(null, results)
+        //                 callback(err);
+        //             }
+        //             // else if (results.length === 0) {
+        //             //     console.log("conn query if err----------------------------------------", err)
+        //             //     console.log("User ID does not exist");
+        //             //     callback(err);
+        //             //     return;
+        //             // }
+        //             else {
+        //                 // callback(results.map(function(obj) {
+        //                 //   var rObj = {};
+        //                 //   rObj.id = obj.posts_id;
+        //                 //   rObj.title = obj.posts_title;
+        //                 //   rObj.url = obj.posts_url;
+        //                 //   rObj.createdAt = obj.posts_createdAt;
+        //                 //   rObj.updatedAt = obj.posts_updatedAt;
+        //                 //   rObj.userId = obj.posts_userId;
+        //                 //   rObj.users = {}
+        //                 //       rObj.users.id = obj.users_id;
+        //                 //       rObj.users.username = obj.users_username;
+        //                 //       rObj.users.createdAt = obj.users_createdAt;
+        //                 //       rObj.users.updatedAt = obj.users_updatedAt;
+        //                 //   return rObj;
+        //                 // }));
+        //                 // console.log("RESULT OF FUNCTON---------------xxxxxxxxxxxxxxx----------", results)
+        //                 callback(null, results)
 
-                    }
-                }
-            );
-        },
+        //             }
+        //         }
+        //     );
+        // },
         getSinglePost: function(postId, callback) {
 
             var sqlQuery = `
@@ -681,7 +681,7 @@ module.exports = function CredditAPI(conn) {
             var headerLoggedIn = `
             <ul>
                 <li>Hi ${username}!</li>
-                <li><button><a href="/posts/${userId}" style="text-decoration:none">my posts</a></button></li>
+                <li><button><a href="/allposts?user=${userId}" style="text-decoration:none">my posts</a></button></li>
                 <li><button><a href="/createContent" style="text-decoration:none">create post</a></button></li>
                 <li><button><a href="/logout" style="text-decoration:none">logout</a></button></li>
             </ul>
@@ -758,6 +758,13 @@ module.exports = function CredditAPI(conn) {
                 }
             );
         },
+        getTitleFromHtml: function(html) {
+            
+            return html.split("<title>")[1].split("</title>")[0]; 
+            
+        }
+        
+        
         // insert new functions here
 
 
