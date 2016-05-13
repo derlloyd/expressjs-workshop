@@ -1,0 +1,26 @@
+
+/*--------------------------------------------------FIRST TOP HEADER------------------------------------*/
+/*will contain a horizontal list of links to subreddits*/
+/*also uses nav tags*/
+
+
+.subreddit-options-header {
+    background-color: lightgreen;
+    font-size: 0.8em;
+}
+
+.subreddit-options-header ul{
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    /*justify-content: space-around;*/
+    /*flex-direction: column;*/
+}
+
+.subreddit-options-header ul li {
+    /*color: green;*/
+    border: 1px solid black;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    margin: 0.2em;
+}

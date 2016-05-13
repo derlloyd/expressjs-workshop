@@ -47,6 +47,8 @@ verify if actually writing new value to request header when sorting method chang
         ON posts.subredditId=subreddits.id
         LEFT JOIN votes
         ON posts.id=votes.postId
+        WHERE users.id = 2
+        AND subreddits.id = 2
         GROUP BY posts.id
         ORDER BY voteScore DESC,
         posts.createdAt DESC

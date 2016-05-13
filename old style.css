@@ -1,4 +1,5 @@
 body {
+    
     font-family: verdana;
     font-size: 16px;
     
@@ -98,7 +99,13 @@ body {
     font-size: 1.5em;
     padding: 0;
     margin: 0;
+    animation: blinker 3s linear infinite;
 }
+
+@keyframes blinker {  
+  50% { opacity: 0.2; }
+}
+
 /*-----------------------------------------------------------------child3*/
 #user-header {
     justify-content: flex-end;
@@ -255,11 +262,13 @@ input, textarea {
 }
 
 
-.newpost-form {
-  width   : inherit;
-    
+.newpost-form input {
+  width   : 400px;
     
 }
+
+
+
 
 /*----------------------------------------------------------------------A TAG UNICODE ARROWS--------------------------*/
 .vote-up {
@@ -281,20 +290,41 @@ input, textarea {
 }
 
 
+/*--------------------------------------------------------------SUGGEST TITLE FUNCTION---------------------------*/
+/*these classes are on elements in the createContent html string*/
+
+/*empty div after title box*/
+.spinner {
+    
+    
+}
+
+
+/*this is the button in the createContent page that suggests a title from url*/
+.suggest-title {
+    
+    
+}
+
+
+
+
+
 /*----------------------------------------------------------------------BUTTONS----------------------------------*/
-button {
+
+/*button {*/
   /*position     : absolute;*/
   /*left         : 440px;*/
   /*top          : 360px;*/
-  text-decoration: none;
-  padding      : 5px;
+/*  text-decoration: none;*/
+/*  padding      : 5px;*/
 
   /*font         : bold .6em sans-serif;*/
-  border       : 1px solid black;
-  border-radius: 5px;
+/*  border       : 1px solid black;*/
+/*  border-radius: 5px;*/
   /*background   : none;*/
-  width: inherit;
-  margin-top: 1em;
+/*  width: inherit;*/
+/*  margin-top: 1em;*/
   /*cursor       : pointer;*/
 
 /*-webkit-transform: rotate(-1.5deg);*/
@@ -302,19 +332,19 @@ button {
 /*    -ms-transform: rotate(-1.5deg);*/
 /*     -o-transform: rotate(-1.5deg);*/
 /*        transform: rotate(-1.5deg);*/
-}
+/*}*/
 
-button:after {
-  content: "";
-}
+/*button:after {*/
+/*  content: "";*/
+/*}*/
 
-button:hover,
-button:focus {
-  outline   : none;
-  background: white;
+/*button:hover,*/
+/*button:focus {*/
+/*  outline   : none;*/
+/*  background: white;*/
   /*color   : blue;*/
   /*color   : #FFF;*/
-}
+/*}*/
 
 
 /*----------------------------------------------------------------FOOTER-----------------------------------*/

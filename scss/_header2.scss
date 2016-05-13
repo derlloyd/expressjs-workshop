@@ -1,0 +1,91 @@
+
+/*--------------------------------------------------SECOND TOP HEADER------------------------------------*/
+
+/*contains 3 li elements, id=logo, id=title, id=user-header */
+/*sets all within as flex*/
+.logo-header ul {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    /*text-align: justify;  */
+    /*align-items: center;*/
+    /*margin: 20px;*/
+    /*justify-content: space-around;*/
+    align-items: flex-end;
+}
+
+.logo-header ul li {
+    display: flex;
+    /*border: 1px solid green;*/
+    
+}
+
+
+.logo-header-items {
+    justify-content: space-around;
+}
+
+/*-----------------------------------------------------------------child1*/
+
+/*fix dimensions of logo*/
+#logo {
+    width: 50px;    
+    /*flex-grow: 1;*/
+}
+
+/*-----------------------------------------------------------------child2*/
+/*this is the title of the site "REDDIT CLONE"*/
+#title {
+    align-items: flex-end;
+    flex-grow: 5;
+    /*width: auto;*/
+    /*flex-direction: column;*/
+}
+
+
+/*main-logo is the class of h1 found in the li id=title*/
+/*to float a sign over a box*/
+.main-logo::before {
+    font-size: 0.3em;
+    content: "NEW";
+    background-color: red;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-family: helvetica;
+    transform: rotateZ(-45deg);
+    position: absolute;
+    top: -10px;
+    left: -20px;
+}
+/*absolute is like putting it on a separate layer*/
+/*need to make immediate parent position RELATIVE*/
+
+.main-logo {
+    position: relative;
+    font-size: 1.5em;
+    padding: 0;
+    margin: 0;
+    animation: blinker 3s linear infinite;
+}
+
+@keyframes blinker {  
+  50% { opacity: 0.2; }
+}
+
+/*-----------------------------------------------------------------child3*/
+#user-header {
+    justify-content: flex-end;
+    /*width:150px;*/
+    flex-grow: 2;
+    /*background-color: lightblue;*/
+    /*display: flex;*/
+}
+
+#user-header li {
+    margin-right: 20px;
+    /*background-color: lightblue;*/
+    /*display: flex;*/
+}
+

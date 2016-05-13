@@ -1,0 +1,262 @@
+/*--------------------------------------------------FIRST TOP HEADER------------------------------------*/
+/*will contain a horizontal list of links to subreddits*/
+/*also uses nav tags*/
+.subreddit-options-header {
+  background-color: lightgreen;
+  font-size: 0.8em; }
+
+.subreddit-options-header ul {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  /*justify-content: space-around;*/
+  /*flex-direction: column;*/ }
+
+.subreddit-options-header ul li {
+  /*color: green;*/
+  border: 1px solid black;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  margin: 0.2em; }
+
+/*--------------------------------------------------SECOND TOP HEADER------------------------------------*/
+/*contains 3 li elements, id=logo, id=title, id=user-header */
+/*sets all within as flex*/
+.logo-header ul {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  /*text-align: justify;  */
+  /*align-items: center;*/
+  /*margin: 20px;*/
+  /*justify-content: space-around;*/
+  align-items: flex-end; }
+
+.logo-header ul li {
+  display: flex;
+  /*border: 1px solid green;*/ }
+
+.logo-header-items {
+  justify-content: space-around; }
+
+/*-----------------------------------------------------------------child1*/
+/*fix dimensions of logo*/
+#logo {
+  width: 50px;
+  /*flex-grow: 1;*/ }
+
+/*-----------------------------------------------------------------child2*/
+/*this is the title of the site "REDDIT CLONE"*/
+#title {
+  align-items: flex-end;
+  flex-grow: 5;
+  /*width: auto;*/
+  /*flex-direction: column;*/ }
+
+/*main-logo is the class of h1 found in the li id=title*/
+/*to float a sign over a box*/
+.main-logo::before {
+  font-size: 0.3em;
+  content: "NEW";
+  background-color: red;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-family: helvetica;
+  transform: rotateZ(-45deg);
+  position: absolute;
+  top: -10px;
+  left: -20px; }
+
+/*absolute is like putting it on a separate layer*/
+/*need to make immediate parent position RELATIVE*/
+.main-logo {
+  position: relative;
+  font-size: 1.5em;
+  padding: 0;
+  margin: 0;
+  animation: blinker 3s linear infinite; }
+
+@keyframes blinker {
+  50% {
+    opacity: 0.2; } }
+/*-----------------------------------------------------------------child3*/
+#user-header {
+  justify-content: flex-end;
+  /*width:150px;*/
+  flex-grow: 2;
+  /*background-color: lightblue;*/
+  /*display: flex;*/ }
+
+#user-header li {
+  margin-right: 20px;
+  /*background-color: lightblue;*/
+  /*display: flex;*/ }
+
+/*--------------------------------------------------------------SUGGEST TITLE FUNCTION---------------------------*/
+/*these classes are on elements in the createContent html string*/
+/*empty div after title box*/
+/*this is the button in the createContent page that suggests a title from url*/
+/*----------------------------------------------------------------------BUTTONS----------------------------------*/
+/*button {*/
+/*position     : absolute;*/
+/*left         : 440px;*/
+/*top          : 360px;*/
+/*  text-decoration: none;*/
+/*  padding      : 5px;*/
+/*font         : bold .6em sans-serif;*/
+/*  border       : 1px solid black;*/
+/*  border-radius: 5px;*/
+/*background   : none;*/
+/*  width: inherit;*/
+/*  margin-top: 1em;*/
+/*cursor       : pointer;*/
+/*-webkit-transform: rotate(-1.5deg);*/
+/*-moz-transform: rotate(-1.5deg);*/
+/*    -ms-transform: rotate(-1.5deg);*/
+/*     -o-transform: rotate(-1.5deg);*/
+/*        transform: rotate(-1.5deg);*/
+/*}*/
+/*button:after {*/
+/*  content: "";*/
+/*}*/
+/*button:hover,*/
+/*button:focus {*/
+/*  outline   : none;*/
+/*  background: white;*/
+/*color   : blue;*/
+/*color   : #FFF;*/
+/*}*/
+/*----------------------------------------------------------------------FORMS----------------------------------*/
+form {
+  line-height: 2em; }
+
+input, textarea {
+  /*font    : .9em/1.5em "handwriting", sans-serif;*/
+  border: 2px solid lightblue;
+  /*padding : 0 10px;*/
+  margin: 0;
+  height: 2em;
+  /*background: none;*/ }
+
+.signup-form {
+  width: inherit; }
+
+.login-form {
+  width: inherit; }
+
+.newpost-form input {
+  width: 400px; }
+
+/*----------------------------------------------------------------------A TAG UNICODE ARROWS--------------------------*/
+.vote-up {
+  font-size: 1.5em;
+  /*font-stretch: expanded;*/
+  text-decoration: none; }
+
+.vote-down {
+  font-size: 1.5em;
+  text-decoration: none;
+  color: blue;
+  text-decoration: bold;
+  /*-webkit-transform: rotateX(90deg);*/
+  /*   -moz-transform: rotateX(90deg);*/
+  /*    -ms-transform: rotateX(90deg);*/
+  /*     -o-transform: rotateX(90deg);*/
+  /*        transform: rotateX(90deg);*/ }
+
+body {
+  font-family: verdana;
+  font-size: 16px; }
+
+/*---------------------------------------------------MAIN CONTENT ITEMS-------------------------------*/
+/*any content that generates in the main area*/
+/*this are the a tags that display sorting options above posts in allposts handler*/
+.sort-options {
+  border: 1px solid green;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 0; }
+
+/*this is the title of the main area --ex. all posts*/
+.main-content-title {
+  border: 1px solid black;
+  background-color: lightblue;
+  font-size: 1em; }
+
+/*
+diagram of lists in getallposts  all CLASSES:
+main
+
+    ul contents-list
+    
+    li content-item
+    
+        ul content-boxes    
+                li vote-box      li image-box       li info-box
+                
+                
+                ul info-box-items
+                    li created-by            li date
+*/
+/*this is the ul that contains the list of all content-items, ex all posts*/
+.contents-list {
+  border: 1px solid green;
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0;
+  /*display: flex;*/
+  /*flex-direction: row;*/ }
+
+/*this is the ul that contains the vote box, image-box and info-box li's*/
+.content-boxes {
+  list-style: none;
+  display: flex;
+  border: 1px solid orange;
+  margin: 0.5em;
+  font-size: 13px; }
+
+/*this is only the vote box with up, downvote and score*/
+.vote-box {
+  background-color: lightblue;
+  margin-right: 20px;
+  border: 1px solid red;
+  width: 50px;
+  text-align: center;
+  /*float: "left"*/ }
+
+/*this box contains title, link, info...*/
+.info-box {
+  /*margin: auto;*/
+  /*text-align: "left";*/
+  justify-content: space-around;
+  padding: 0.5em;
+  /*border: 1px solid red;*/ }
+
+.info-box-items {
+  display: flex; }
+
+.info-box-items li {
+  padding-right: 20px; }
+
+/*all uls within the content*/
+main ul {
+  list-style: none;
+  padding-left: 0; }
+
+/*main ul li{*/
+/*    border: 1px solid black;*/
+/*flex: 1;*/
+/*    padding-left: 10px;*/
+/*    margin: 0.2em;*/
+/*}*/
+/*heading of the posts*/
+/*main ul li h2 {*/
+/*    font-size: 1.1em;*/
+/*}*/
+/*----------------------------------------------------------------FOOTER-----------------------------------*/
+footer {
+  margin-top: 4em; }
+
+/*# sourceMappingURL=style.css.map */

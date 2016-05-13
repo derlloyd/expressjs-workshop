@@ -1,0 +1,136 @@
+
+
+
+@import "header1";
+@import "header2";
+@import "suggest-title";
+@import "buttons";
+@import "forms";
+@import "vote-arrows";
+
+
+body {
+    font-family: verdana;
+    font-size: 16px;
+    
+}
+
+/*---------------------------------------------------MAIN CONTENT ITEMS-------------------------------*/
+/*any content that generates in the main area*/
+
+/*this are the a tags that display sorting options above posts in allposts handler*/
+.sort-options {
+    border: 1px solid green;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-bottom: 0;
+}
+
+
+/*this is the title of the main area --ex. all posts*/
+.main-content-title {
+    border: 1px solid black;
+    background-color: lightblue;
+    font-size: 1em;
+    
+}
+
+
+/*
+diagram of lists in getallposts  all CLASSES:
+main
+
+    ul contents-list
+    
+    li content-item
+    
+        ul content-boxes    
+                li vote-box      li image-box       li info-box
+                
+                
+                ul info-box-items
+                    li created-by            li date
+*/
+
+        
+/*this is the ul that contains the list of all content-items, ex all posts*/
+.contents-list {
+    border: 1px solid green;
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0;
+    /*display: flex;*/
+    /*flex-direction: row;*/
+}
+
+
+.content-item {
+    
+}
+
+
+/*this is the ul that contains the vote box, image-box and info-box li's*/
+.content-boxes {
+    list-style: none;
+    display: flex;
+    border: 1px solid orange;
+    margin: 0.5em;
+    font-size: 13px
+}
+
+/*this is only the vote box with up, downvote and score*/
+.vote-box {
+    background-color: lightblue;
+    margin-right: 20px;
+    border: 1px solid red;
+    width: 50px;
+    text-align: center;
+    /*float: "left"*/
+}
+
+
+/*this box contains title, link, info...*/
+.info-box {
+    /*margin: auto;*/
+    /*text-align: "left";*/
+    justify-content: space-around;
+    padding: 0.5em;
+    /*border: 1px solid red;*/
+}
+
+
+.info-box-items {
+    display: flex;
+}
+
+.info-box-items li {
+    padding-right: 20px;
+}    
+
+/*all uls within the content*/
+main ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+/*main ul li{*/
+/*    border: 1px solid black;*/
+    /*flex: 1;*/
+/*    padding-left: 10px;*/
+/*    margin: 0.2em;*/
+/*}*/
+
+/*heading of the posts*/
+/*main ul li h2 {*/
+/*    font-size: 1.1em;*/
+/*}*/
+
+
+
+
+
+/*----------------------------------------------------------------FOOTER-----------------------------------*/
+
+footer {
+    margin-top: 4em;
+}

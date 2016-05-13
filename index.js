@@ -21,7 +21,7 @@ var cookieParser = require('cookie-parser')
 app.use(cookieParser())
 var moment = require('moment')
 
-app.use(express.static("css"));
+app.use(express.static("public"));
 
 // ------------------------------MIDDLEWARE--------------------------------------------
 // ------------------------------------------------------------------------------------
@@ -232,20 +232,33 @@ app.get('/createContent/', function(request, response) {
     var username = request.loggedInUser ? request.loggedInUser.users_username : "";
     
     var html = `
-        <form class="newpost-form" action="/createContent" method="POST"> 
+    <form class="newpost-form" action="/createContent" method="POST"> 
       <div>
-        <input type="text" name="url" placeholder="Enter a URL to content">
+        <input class="the-url" type="text" name="url" placeholder="Enter a URL to content">
       </div>
+    <button class="suggest-title" type="button">suggest title</button>
       <div>
-        <input type="text" name="title" placeholder="Enter the title of your content">
+        <input class="the-title" type="text" name="title" placeholder="Enter the title of your content">
       </div>
+      <div class=spinner></div>
       <div>
-        <input type="text" name="subreddit" placeholder="Fixed at 2 for now">
+        <input class="the-sub" type="text" name="subreddit" placeholder="Fixed at 2 for now - MAKE DROPDOWN OR FORM FILE">
       </div>
       <button type="submit">Create!</button>
     </form>
     
     <button><a href="/" style="text-decoration: none">Cancel</a></button>
+    <script src="https://code.jquery.com/jquery-1.12.3.js"></script>
+    <script>
+    
+        function createContentScript() {
+          $(.the-title).val('xyz');  
+        console.log("WITHIN CREATE CONTENT")
+    }
+    
+    
+    </script>
+    
     `
     
     response.send(credditAPI.renderLayout("Create Post", html, userId, username));
@@ -261,18 +274,21 @@ app.get('/allposts', function(req, res) {
     var username = req.loggedInUser ? req.loggedInUser.users_username : "";
     
     // user can enter a search argument after the res path, value is store as req.query.sort
-    // console.log("REQUEST QUERY=========================================================",req.query.sort)
+    // console.log("REQUEST QUERY=========================================================",req.query)
     // default sortMethod is stored in the global request header from the middleware req.displayOptions.sortAllPosts
     // console.log("PREVIOUS GLOBAL DISPLAY OPTION==================================================",req.displayOptions.sortAllPosts)
     // if a sort path is entered that corresponds to sorting method, change global request header
     // and call getAllPosts function with that sortingMethod
     
+    var displaySorted = "sorted by "+req.displayOptions.sortAllPosts;
     if (req.query.sort === "new") {
         var sortBy = "new";
+        displaySorted = "sorted by new";
         req.displayOptions.sortAllPosts = "new";
     } 
     else if (req.query.sort === "hot") {
         var sortBy = "hot";
+        displaySorted = "sorted by hot";
         req.displayOptions.sortAllPosts = "hot";
     } 
     else {
@@ -281,13 +297,26 @@ app.get('/allposts', function(req, res) {
         var sortBy = req.displayOptions.sortAllPosts
     }
     
+    // if user entered a query filter for subreddit or to show only posts for a certain user
+    // create a filter object and pass it to function
+    var filter = {}
+    var displayFilter = ""
+    if (req.query.subreddit) {
+        filter.subreddit = req.query.subreddit;
+        displayFilter = "  filtered by subreddit"
+    }
+    if (req.query.user) {
+        filter.user = req.query.user;
+        displayFilter = "  filtered by user"
+    }
+    // console.log("FILTER''''''''''''''''''''==================", filter)
     // console.log("================================================================")
     // console.log("NEW SORT METHOD================================================================", sortBy)
     // console.log("NEW GLOBAL DISPLAY OPTION==================================================",req.displayOptions.sortAllPosts)
     
     
     // OPTIONS for number of posts per page and current page are in this API function
-    credditAPI.getAllPosts(req.displayOptions, sortBy, function(err, posts) {
+    credditAPI.getAllPosts(req.displayOptions, sortBy, filter, function(err, posts) {
         // OPTIONS PER PAGE ARE DEFINED IN THIS Fn
         // console.log("POSTS RESULT============================", posts)
         // console.log("POSTS ERR============================", err)
@@ -333,7 +362,7 @@ app.get('/allposts', function(req, res) {
                                             <a href="${obj.url}">${obj.title}</a>
                                         </h2>
                                         </li>
-                                        <li><a href="">/r/${obj.subreddit.name}</a></li>
+                                        <li><a href="/allposts?subreddit=${obj.subreddit.id}">/r/${obj.subreddit.name}</a></li>
                                         
                                         <li>
                                         <ul class="info-box-items">
@@ -357,7 +386,7 @@ app.get('/allposts', function(req, res) {
                         
                         <a class="sort-options" href="/allposts?sort=hot">hot</a>
                         <a class="sort-options" href="/allposts?sort=new">new</a>
-                
+                        ${displaySorted}${displayFilter}
                         <ul class="contents-list">` + htmlString +
                     `</ul>
                     

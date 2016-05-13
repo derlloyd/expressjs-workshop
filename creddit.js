@@ -94,7 +94,7 @@ module.exports = function CredditAPI(conn) {
                 }
             );
         },
-        getAllPosts: function(options, sortingMethod, callback) {
+        getAllPosts: function(options, sortingMethod, filter, callback) {
             // In case we are called without an options parameter, shift all the parameters manually
             if (!callback) {
                 callback = options;
@@ -103,18 +103,36 @@ module.exports = function CredditAPI(conn) {
             var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
             var offset = (options.page || 0) * limit;
 
+            //sortingMethod ARGUMENT
             // do we sort the posts by newest or highest vote count?
             if(sortingMethod === "new") {
                 // sort by newest only
-                var sort = " posts.createdAt DESC"
+                var orderBy = "ORDER BY posts.createdAt DESC"
             }
             else if (sortingMethod === "hot") {
                 // sort highest voteScore, then by date, default
-                var sort = " voteScore DESC, posts.createdAt DESC" 
+                var orderBy = "ORDER BY voteScore DESC, posts.createdAt DESC" 
             } 
             else {
                 // default = hot
-                var sort = " voteScore DESC, posts.createdAt DESC" 
+                var orderBy = "ORDER BY voteScore DESC, posts.createdAt DESC" 
+            }
+
+
+            // filter ARGUMENT
+            // console.log("FILTER in function''''''''''''''''''''==================", filter)
+            // where condition
+            // if filter.subreddit=value, then value is "WHERE subreddits.id = xx"
+            // if filter.user=value, then value is "WHERE users.id = xx"
+            // if nothing passed, then ""
+            if (filter.subreddit) {
+                var where = "WHERE subreddits.id ="+filter.subreddit;
+            }
+            else if (filter.user) {
+                var where = "WHERE users.id ="+filter.user;
+            }
+            else {
+                var where = "";
             }
 
             conn.query(`
@@ -140,8 +158,9 @@ module.exports = function CredditAPI(conn) {
         ON posts.subredditId=subreddits.id
         LEFT JOIN votes
         ON posts.id=votes.postId
+        ${where}
         GROUP BY posts.id
-        ORDER BY ${sort}
+        ${orderBy}
         LIMIT ? OFFSET ?
         `, [limit, offset],
                 function(err, results) {
@@ -667,13 +686,13 @@ module.exports = function CredditAPI(conn) {
                 <li><button><a href="/logout" style="text-decoration:none">logout</a></button></li>
             </ul>
         `
-
+            // generate custom header in html with active subreddit, link to allposts?subreddit=id ===============TBD
             var masterHtml = `
             <!DOCTYPE html>
             <html>
                 <head>
                     <title>reddit clone</title>
-                    <link rel="stylesheet" href="../style.css" type="text/css" />
+                    <link rel="stylesheet" href="../css/style.css" type="text/css" />
                 </head>
                 <body>
                     <header class="subreddit-options-header">
@@ -687,7 +706,7 @@ module.exports = function CredditAPI(conn) {
                     <header class="logo-header">
                         <ul class="logo-header-items">
                             <a href="/">
-                            <li id="logo"><img src="../logo.png" alt="" height=50 width=50></li>
+                            <li id="logo"><img src="../images/logo.png" alt="" height=50 width=50></li>
                             </a>
                             <li id="title"><h1 class="main-logo">REDDIT CLONE</h1></li>
                             <li id="user-header">
@@ -705,7 +724,9 @@ module.exports = function CredditAPI(conn) {
                     <footer>--FOOTER--Creddit &copy</footer>
                     <script src="https://code.jquery.com/jquery-1.12.3.js"></script>
                     <script>
-                    
+
+                        $(document).ready(createContentScript())
+                        console.log("WITHIN CREATE CONTENT  =========")    
                     </script>
                 </body>
             </html> 
