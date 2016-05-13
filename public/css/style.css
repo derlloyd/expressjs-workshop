@@ -1,3 +1,11 @@
+@keyframes blinker {
+  50% {
+    opacity: 0.2; } }
+@keyframes spin {
+  from {
+    transform: rotateZ(0deg); }
+  to {
+    transform: rotateZ(360deg); } }
 /*--------------------------------------------------FIRST TOP HEADER------------------------------------*/
 /*will contain a horizontal list of links to subreddits*/
 /*also uses nav tags*/
@@ -76,11 +84,8 @@
   font-size: 1.5em;
   padding: 0;
   margin: 0;
-  animation: blinker 3s linear infinite; }
+  animation: blinker 2s linear infinite; }
 
-@keyframes blinker {
-  50% {
-    opacity: 0.2; } }
 /*-----------------------------------------------------------------child3*/
 #user-header {
   justify-content: flex-end;
@@ -97,6 +102,17 @@
 /*--------------------------------------------------------------SUGGEST TITLE FUNCTION---------------------------*/
 /*these classes are on elements in the createContent html string*/
 /*empty div after title box*/
+.spinner {
+  display: none;
+  vertical-align: bottom;
+  border: 3px solid blue;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  animation: spin 1s linear infinite; }
+
 /*this is the button in the createContent page that suggests a title from url*/
 /*----------------------------------------------------------------------BUTTONS----------------------------------*/
 /*button {*/

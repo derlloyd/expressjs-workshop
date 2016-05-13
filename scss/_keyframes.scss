@@ -1,0 +1,16 @@
+
+
+@keyframes blinker {  
+  50% { opacity: 0.2; }
+}
+
+@keyframes spin {
+    from {
+        transform: rotateZ(0deg);
+    } 
+    to {
+        transform: rotateZ(360deg);
+    }
+}
+
+

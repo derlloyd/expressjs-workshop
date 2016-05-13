@@ -67,12 +67,9 @@
     font-size: 1.5em;
     padding: 0;
     margin: 0;
-    animation: blinker 3s linear infinite;
+    animation: blinker 2s linear infinite;
 }
 
-@keyframes blinker {  
-  50% { opacity: 0.2; }
-}
 
 /*-----------------------------------------------------------------child3*/
 #user-header {

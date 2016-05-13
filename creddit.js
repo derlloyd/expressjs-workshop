@@ -726,7 +726,7 @@ module.exports = function CredditAPI(conn) {
                     <script>
 
                         $(document).ready(createContentScript())
-                        console.log("WITHIN CREATE CONTENT  =========")    
+
                     </script>
                 </body>
             </html> 
@@ -758,12 +758,11 @@ module.exports = function CredditAPI(conn) {
                 }
             );
         },
-        getTitleFromHtml: function(html) {
+        getTitleFromBody: function(body) {
             
-            return html.split("<title>")[1].split("</title>")[0]; 
+            return body.split("<title>")[1].split("</title>")[0]; 
             
         }
-        
         
         // insert new functions here
 

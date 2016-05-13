@@ -241,8 +241,8 @@ app.get('/createContent/', function(request, response) {
     <button class="suggest-title" type="button">suggest title</button>
       <div>
         <input class="the-title" type="text" name="title" placeholder="Enter the title of your content">
+        <div class=spinner></div>
       </div>
-      <div class=spinner></div>
       <div>
         <input class="the-sub" type="text" name="subreddit" placeholder="Fixed at 2 for now - MAKE DROPDOWN OR FORM FILE">
       </div>
@@ -251,10 +251,44 @@ app.get('/createContent/', function(request, response) {
     
     <button><a href="/" style="text-decoration: none">Cancel</a></button>
     <script>
-        console.log("WITHIN CREATE CONTENT")
-    
+        
         function createContentScript() {
-          $('.the-title').val('xyz123');  
+            // this executes when button clicked
+            
+            $('.suggest-title').on('click', function(){
+                
+                // disable button
+                // enable spinner
+                // fade title box
+                // feed url entered by user into the getTitle handler
+                // once data comes back...
+                
+                $('.the-title').css('animation', 'blinker 0.5s linear infinite');  
+                $('.spinner').css('display', 'inline-block');
+                $('.suggest-title').prop('disabled', true);
+                
+                
+                
+                // enable button
+                // stop spinner
+                // stop title box fade
+                // put the result in the title box
+                
+                var url = $('.the-url').val();
+                
+                $.get('https://expressjs-workshop-derlloyd-1.c9users.io/getTitle?url='+url,
+                
+                function(result){
+                    
+                    $('.the-title').val(result)
+                    $('.the-title').css('animation', 'none');  
+                    $('.spinner').css('display', 'none');
+                    $('.suggest-title').prop('disabled', false);
+                    
+                })
+                
+            })
+        
     }
     
     
@@ -373,6 +407,7 @@ app.get('/allposts', function(req, res) {
                                             <li class="date"><p>Created ${moment(obj.createdAt).fromNow()}</p></li>
                                             <li class="created-by"><p>by ${obj.users.username}</p></li>
                                             <li class="post-id"><p>post:${obj.id} - (${obj.url})</p></li>
+                                            <li><p>${userId===obj.users.id ? "     delete and edit buttons": ""}</p></li>
                                         </ul>
                                         </li>
                                     </ul>    
@@ -693,7 +728,7 @@ app.get('/getTitle', function(req, res) {
             
             // set delay on return so that i can work on loading notifications
             setTimeout(function(){
-                res.send(credditAPI.getTitleFromHtml(body))
+                res.send(credditAPI.getTitleFromBody(body))
             }, 2500)
             
             

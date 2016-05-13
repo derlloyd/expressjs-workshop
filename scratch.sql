@@ -12,7 +12,11 @@ add voting table
 add sorting hot and new
 need to store votes for this
 
-reaact??
+
+enable them only on user's posts
+add delete button and edit button to posts
+
+
 
 
 

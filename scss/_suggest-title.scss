@@ -1,10 +1,19 @@
 /*--------------------------------------------------------------SUGGEST TITLE FUNCTION---------------------------*/
 /*these classes are on elements in the createContent html string*/
 
+
+
 /*empty div after title box*/
 .spinner {
-    
-    
+    display: none;
+    vertical-align: bottom;
+    border: 3px solid blue;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    animation: spin 1s linear infinite;
 }
 
 
